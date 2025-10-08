@@ -42,5 +42,5 @@ User berperan sebagai pengunjung atau pengguna umum yang dapat mengakses dan mel
 Admin berperan sebagai pengelola sistem dan konten di dalam website. Mereka memiliki akses penuh untuk menambah, mengedit, dan menghapus data pada berbagai halaman seperti News, Events, Match, dan Ranks. Admin juga bisa melakukan registrasi dan login khusus untuk akun Admin.
 
 ## Link deployment PWS dan Figma
-PWS: https://www.figma.com/design/ZwcfOqF8bYUJLLdmwdFZtv/Sports-news-websites--Community-?node-id=0-1&p=f&t=sGsiLdkhv5wqYU8e-0
+PWS: https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id/
 Figma: https://www.figma.com/design/ZwcfOqF8bYUJLLdmwdFZtv/Sports-news-websites--Community-?node-id=0-1&p=f&t=sGsiLdkhv5wqYU8e-0
