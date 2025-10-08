@@ -31,8 +31,12 @@ Dengan deskripsi lengkap ada pada dokumen berikut:
 https://docs.google.com/spreadsheets/d/15eJ-LpLnWmHIyQThtehrUHohx0AWYusJGaI6Y-9F1SM/edit?gid=1323547941#gid=1323547941
 
 ## Sumber dataset
+https://github.com/NocturneBear/NBA-Data-2010-2024
 https://www.kaggle.com/datasets/bryanchungweather/nba-player-stats-dataset-for-the-2023-2024
 https://www.kaggle.com/datasets/wyattowalsh/basketball/data
+
+## File csv Dataset
+https://drive.google.com/drive/folders/15Fk-8Qvf4i8dOCzDLvNblNz_2_hJa9yd?usp=share_link
 
 ## Role/peran pengguna:
 1. User:
