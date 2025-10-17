@@ -12,7 +12,8 @@ class News(models.Model):
         ('highlight', 'Game Highlights'),
         ('analysis', 'Team & Player Analysis'),
     ]
-
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True) 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     content = models.TextField()
