@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-7nkltkv$=+en+qoz396d0_r&nt+*)hni(zw_7@svqex1shu=z1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id"]
 
 PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 
@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'authentication',
+    'news',
 ]
 
 MIDDLEWARE = [
