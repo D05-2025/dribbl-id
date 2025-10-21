@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto p-4 md:p-8">
+
+    <div class="mb-8">
+        <h2 class="text-3xl font-bold text-gray-800">Latest Football News</h2>
+        <p class="text-gray-600 mb-4">Stay updated with the latest football stories and analysis</p>
+    </div>
+
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-4">
+        <div class="flex space-x-2 mb-4 sm:mb-0">
+            <button id="add-news-btn" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75 transition duration-150 ease-in-out">
+                Create News by AJAX
+            </button>
+        </div>
+        <div class="flex space-x-2">
+            <button class="px-4 py-2 text-white font-semibold rounded-lg bg-green-600">All News</button>
+            <button class="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100">My News</button>
+        </div>
+    </div>
+
+
+    <div id="news-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        </div>
+    
+</div>
+
+<div id="news-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-1/2 shadow-lg rounded-md bg-white">
+        <div id="modal-content">
+            <h3 class="text-xl font-bold mb-4" id="modal-title"></h3>
+            <form id="news-form" class="space-y-4">
+                {% csrf_token %}
+                
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700">Judul</label>
+                    <input type="text" id="title" name="title" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label for="content" class="block text-sm font-medium text-gray-700">Konten</label>
+                    <textarea id="content" name="content" rows="4" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                </div>
+                
+                <div>
+                    <label for="category" class="block text-sm font-medium text-gray-700">Kategori</label>
+                    <select id="category" name="category" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="nba">NBA</option>
+                        <option value="ibl">IBL</option>
+                        <option value="fiba">FIBA</option>
+                        <option value="transfer">Transfers & Trades</option>
+                        <option value="highlight">Game Highlights</option>
+                        <option value="analysis">Team & Player Analysis</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="thumbnail" class="block text-sm font-medium text-gray-700">URL Thumbnail</label>
+                    <input type="url" id="thumbnail" name="thumbnail" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div class="flex items-center">
+                    <input type="checkbox" id="is_featured" name="is_featured" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="is_featured" class="ml-2 block text-sm text-gray-900">Featured News</label>
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="close-modal-btn" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
+                    <button type="submit" id="submit-news-btn" class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-150">Simpan</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const newsListDiv = document.getElementById('news-list');
+        const modal = document.getElementById('news-modal');
+        const addNewsBtn = document.getElementById('add-news-btn');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const newsForm = document.getElementById('news-form');
+        const modalTitle = document.getElementById('modal-title');
+
+        // --- URL API (Pastikan ini sesuai dengan urls.py Anda) ---
+        const API_URLS = {
+            list: "{% url 'news:show_json' %}", 
+            add: "{% url 'news:add_news_entry_ajax' %}",
+            // Edit, Delete, Detail URLs are dynamic, defined below
+        };
+
+        // --- Fungsi Helper untuk CSRF Token ---
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        // --- Fungsi untuk Merender Berita Item (Card Layout) ---
+        function renderNewsItem(news) {
+            // News data comes from the JSON API. We need to access its fields property.
+            const fields = news.fields;
+            const newsId = news.pk; // Primary key (ID) is here
+
+            const date = new Date(fields.published_at || new Date());
+            const formattedDate = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/, | /g, ' ');
+            const summary = fields.content.length > 102 ? fields.content.substring(0, 99) + '...' : fields.content;
+            
+            // Mengambil nama kategori yang terlihat
+            const categoryMap = {
+                'nba': 'NBA', 'ibl': 'IBL', 'fiba': 'FIBA', 
+                'transfer': 'Transfers & Trades', 'highlight': 'Game Highlights', 
+                'analysis': 'Team & Player Analysis'
+            };
+            const visibleCategory = categoryMap[fields.category] || fields.category;
+            
+            // URL detail berita: {% url 'news:show_news' id %}
+            const detailUrl = `{% url 'news:show_news' 0 %}`.replace('0', newsId);
+            const isFeatured = fields.is_featured ? '<span class="absolute top-2 right-2 bg-yellow-500 text-xs font-semibold px-2 py-0.5 rounded text-white">Featured</span>' : '';
+            const updateTag = fields.published_at && (new Date() - date < 86400000) ? '<span class="absolute top-2 left-2 bg-green-500 text-xs font-semibold px-2 py-0.5 rounded text-white">Update</span>' : '';
+
+            // Using the card structure to match image_b47b38.png
+            return `
+                <div id="news-${newsId}" class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition duration-300 ease-in-out">
+                    <div class="relative h-48 bg-gray-200">
+                        <img src="${fields.thumbnail || '{% static "img/placeholder.jpg" %}'}" alt="${fields.title}" class="w-full h-full object-cover">
+                        ${updateTag}
+                        ${isFeatured}
+                    </div>
+                    
+                    <div class="p-4">
+                        <p class="text-xs text-gray-500 mb-2">${formattedDate} • 0 views</p>
+                        
+                        <h3 class="text-xl font-bold text-gray-900 mb-3 leading-snug">
+                            <a href="${detailUrl}" class="hover:text-red-600 transition duration-150">${fields.title}</a>
+                        </h3>
+                        
+                        <p class="text-sm text-gray-600 mb-3">
+                            ${summary}
+                        </p>
+
+                        <div class="flex justify-between items-center text-sm mt-3 border-t pt-3">
+                            <a href="${detailUrl}" class="text-green-600 hover:text-green-800 font-medium">Read more</a>
+                            <div class="space-x-4">
+                                <button class="edit-btn text-blue-600 hover:text-blue-800 font-medium" data-id="${newsId}" data-title="${fields.title}" data-content="${fields.content}" data-category="${fields.category}" data-thumbnail="${fields.thumbnail}" data-featured="${fields.is_featured}">Edit</button>
+                                <button class="delete-btn text-red-600 hover:text-red-800 font-medium" data-id="${newsId}">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Fungsi Utama: Memuat Daftar Berita ---
+        async function loadNewsList() {
+            try {
+                const response = await fetch(API_URLS.list);
+                if (!response.ok) throw new Error('Failed to fetch news data');
+                const newsData = await response.json();
+                
+                newsListDiv.innerHTML = ''; // Kosongkan daftar
+                if (newsData.length === 0) {
+                     newsListDiv.innerHTML = '<p class="text-gray-500 col-span-full text-center py-10">Tidak ada berita yang tersedia.</p>';
+                } else {
+                    newsData.forEach(news => {
+                        // news is an object like: { pk: '...', model: '...', fields: { title: '...', content: '...' } }
+                        newsListDiv.innerHTML += renderNewsItem(news);
+                    });
+                }
+
+
+                // Pasang event listener untuk tombol aksi (Edit & Delete)
+                attachActionListeners();
+
+            } catch (error) {
+                console.error('Error loading news list:', error);
+                newsListDiv.innerHTML = '<p class="text-red-500 col-span-full text-center py-10">Gagal memuat berita. Pastikan URL API sudah benar.</p>';
+            }
+        }
+        
+        // --- Fungsi untuk Membuka Modal (Add/Edit) ---
+        function openModal(mode, newsId = null, newsData = {}) {
+            newsForm.reset();
+            newsForm.dataset.mode = mode;
+            newsForm.dataset.newsId = newsId;
+            
+            // Clear the checkbox before setting data
+            document.getElementById('is_featured').checked = false; 
+
+            if (mode === 'add') {
+                modalTitle.textContent = 'Tambah Berita Baru';
+                // URL is set by API_URLS.add
+            } else if (mode === 'edit' && newsData) {
+                modalTitle.textContent = `Edit Berita: ${newsData.title || newsId}`;
+                
+                // Isi form dengan data berita
+                document.getElementById('title').value = newsData.title || '';
+                document.getElementById('content').value = newsData.content || '';
+                document.getElementById('category').value = newsData.category || '';
+                document.getElementById('thumbnail').value = newsData.thumbnail || '';
+                document.getElementById('is_featured').checked = newsData.is_featured === 'True' || newsData.is_featured === true; // Handle 'True' string from data-attribute
+            }
+            
+            modal.classList.remove('hidden');
+        }
+
+        // --- Fungsi untuk Menutup Modal ---
+        function closeModal() {
+            modal.classList.add('hidden');
+            newsForm.reset();
+            delete newsForm.dataset.mode;
+            delete newsForm.dataset.newsId;
+        }
+
+        // --- Event Listener Tombol Tambah ---
+        addNewsBtn.addEventListener('click', () => openModal('add'));
+        closeModalBtn.addEventListener('click', closeModal);
+        
+        // Menutup modal ketika klik di luar area modal
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // --- Handler Form Submit (Add & Edit) ---
+        newsForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // We use standard FormData which handles multipart data for Django
+            const formData = new FormData(this);
+            // Manually handle the checkbox for Featured News, as unchecked boxes aren't included in FormData
+            if (!document.getElementById('is_featured').checked) {
+                formData.append('is_featured', 'off'); // Explicitly send 'off' or 'False' if needed
+            }
+
+            const mode = this.dataset.mode;
+            const newsId = this.dataset.newsId;
+            
+            let url = '';
+
+            if (mode === 'add') {
+                url = API_URLS.add;
+            } else if (mode === 'edit') {
+                // Construct dynamic URL for edit
+                url = `{% url 'news:edit_news_entry_ajax' 0 %}`.replace('0', newsId);
+            }
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken,
+                    },
+                    body: formData,
+                });
+
+                const responseData = await response.json(); // Assuming Django returns JSON
+                
+                if (response.ok) {
+                    closeModal();
+                    alert(`Berita berhasil di${mode === 'add' ? 'tambahkan' : 'ubah'}!`);
+                    loadNewsList(); // Muat ulang daftar
+                } else {
+                    // Display error message from Django response
+                    alert(`Gagal menyimpan berita: ${responseData.message || response.statusText}`);
+                }
+            } catch (error) {
+                console.error('Submit Error:', error);
+                alert('Terjadi kesalahan saat berkomunikasi dengan server.');
+            }
+        });
+
+        // --- Fungsi untuk Menangani Edit dan Delete ---
+        function attachActionListeners() {
+            // Event Listener untuk Tombol Edit
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.onclick = async function() {
+                    const newsId = this.dataset.id;
+                    
+                    // Fetch data to ensure it's fresh, but also use data attributes for convenience
+                    try {
+                        // Fetching fresh data by ID (assuming UUID is the ID)
+                        const response = await fetch(`{% url 'news:show_json_by_id' 0 %}`.replace('0', newsId));
+                        if (!response.ok) throw new Error('Failed to fetch news detail');
+                        
+                        // Assuming show_json_by_id returns a single object { pk: ..., fields: {...} }
+                        const newsArray = await response.json();
+                        if (newsArray.length === 0) throw new Error('News not found');
+
+                        // Flatten the data for openModal function
+                        const newsData = {
+                            id: newsArray[0].pk,
+                            title: newsArray[0].fields.title,
+                            content: newsArray[0].fields.content,
+                            category: newsArray[0].fields.category,
+                            thumbnail: newsArray[0].fields.thumbnail,
+                            is_featured: newsArray[0].fields.is_featured,
+                        };
+
+                        openModal('edit', newsId, newsData);
+                    } catch (error) {
+                        console.error('Error fetching news detail:', error);
+                        // Fallback: use data attributes from the card (might be outdated)
+                        const fallbackData = {
+                             title: this.dataset.title,
+                             content: this.dataset.content,
+                             category: this.dataset.category,
+                             thumbnail: this.dataset.thumbnail,
+                             is_featured: this.dataset.featured,
+                        };
+                        openModal('edit', newsId, fallbackData);
+                    }
+                };
+            });
+
+            // Event Listener untuk Tombol Delete
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.onclick = async function() {
+                    const newsId = this.dataset.id;
+                    if (confirm('Yakin ingin menghapus berita ini?')) {
+                        // Construct dynamic URL for delete
+                        const url = `{% url 'news:delete_news_ajax' 0 %}`.replace('0', newsId);
+                        
+                        try {
+                            const response = await fetch(url, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRFToken': csrftoken,
+                                    // Use 'Content-Type' only if you are sending a JSON body, not FormData
+                                },
+                            });
+
+                            const responseData = await response.json();
+                            
+                            if (response.ok) {
+                                alert('Berita berhasil dihapus!');
+                                // Instead of full reload, you can remove the element for faster UI update
+                                document.getElementById(`news-${newsId}`).remove();
+                                // loadNewsList(); // Or reload the list completely if preferred
+                            } else {
+                                alert(`Gagal menghapus berita: ${responseData.message || response.statusText}`);
+                            }
+                        } catch (error) {
+                            console.error('Delete Error:', error);
+                            alert('Terjadi kesalahan saat menghapus berita.');
+                        }
+                    }
+                };
+            });
+        }
+
+        // --- Inisialisasi: Muat berita saat halaman pertama kali dibuka ---
+        loadNewsList();
+    });
+</script>
+{% endblock content %}

@@ -24,6 +24,11 @@ def show_news(request,id):
     }
     return render(request, 'news.html', context)
 
+def show_news_page(request):
+    news_list = News.objects.all()
+    context = {'news_list': news_list}
+    return render(request, 'news_page.html', context)
+
 def add_news_entry_ajax(request):
     title = strip_tags(request.POST.get("title")) 
     content = strip_tags(request.POST.get("content"))
