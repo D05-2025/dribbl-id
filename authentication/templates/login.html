@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<title>Login - Dribbl ID</title>
+{% endblock meta %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <h2 class="mt-6 text-center text-3xl font-bold text-gray-900">
+      Sign in to your account
+    </h2>
+    <p class="mt-2 text-center text-sm text-gray-600">
+      Welcome back to Dribbl ID
+    </p>
+  </div>
+
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+      <!-- Messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="mb-4 p-4 rounded-md {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-green-50 text-green-700 border border-green-200{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form class="space-y-6" method="POST">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+        <div class="bg-red-50 border border-red-200 rounded-md p-4">
+          <p class="text-red-700 text-sm">Please enter a correct username and password.</p>
+        </div>
+        {% endif %}
+
+        <div>
+          <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+          <div class="mt-1">
+            <input id="username" name="username" type="text" required 
+                   class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="Enter your username">
+          </div>
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+          <div class="mt-1">
+            <input id="password" name="password" type="password" required 
+                   class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="Enter your password">
+          </div>
+        </div>
+
+        <div>
+          <button type="submit" 
+                  class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Sign in
+          </button>
+        </div>
+      </form>
+
+      <div class="mt-6 text-center">
+        <p class="text-sm text-gray-600">
+          Don't have an account?
+          <a href="{% url 'register' %}" class="font-medium text-blue-600 hover:text-blue-500">
+            Register here
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
