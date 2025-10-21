@@ -14,20 +14,17 @@ from django.utils.html import strip_tags
 from news.models import News
 from news.forms import NewsForm
 from django.views.decorators.csrf import csrf_exempt
+from authentication.decorators import login_required_custom
 
-
-# @login_required()
-def show_news(request,id):
-    news = get_object_or_404(News, pk=id)
-    context = {
-        'news': news
-    }
-    return render(request, 'news.html', context)
-
+@login_required_custom
 def show_news_page(request):
     news_list = News.objects.all()
-    context = {'news_list': news_list}
+    context = {
+        'news_list': news_list,
+        'user': request.user
+    }
     return render(request, 'news_page.html', context)
+
 
 @csrf_exempt
 @require_POST
