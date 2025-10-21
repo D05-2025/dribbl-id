@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'authentication',
     'news',
-    'events',
+    # 'home',
 ]
 
 MIDDLEWARE = [
@@ -54,10 +54,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'authentication.middleware.CustomAuthMiddleware',
 ]
 
 ROOT_URLCONF = 'dribbl_id.urls'
-
+AUTH_USER_MODEL = 'authentication.CustomUser'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
