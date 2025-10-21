@@ -1,10 +1,8 @@
-import uuid
 from django.db import models
-from django.contrib.auth.models import User
-# Create your models here.
+import uuid
 
 class News(models.Model):
-    CATEGORY_CHOICES =[
+    CATEGORY_CHOICES = [
         ('nba', 'NBA'),
         ('ibl', 'IBL'),
         ('fiba', 'FIBA'),
@@ -13,7 +11,8 @@ class News(models.Model):
         ('analysis', 'Team & Player Analysis'),
     ]
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True) 
+    user = models.ForeignKey('authentication.CustomUser', on_delete=models.CASCADE, null=True, blank=True)
+    
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     content = models.TextField()
@@ -23,4 +22,3 @@ class News(models.Model):
 
     def __str__(self):
         return self.title
-
