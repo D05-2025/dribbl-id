@@ -16,7 +16,7 @@ from news.forms import NewsForm
 from django.views.decorators.csrf import csrf_exempt
 
 
-@login_required()
+# @login_required()
 def show_news(request,id):
     news = get_object_or_404(News, pk=id)
     context = {
@@ -29,24 +29,66 @@ def show_news_page(request):
     context = {'news_list': news_list}
     return render(request, 'news_page.html', context)
 
+@csrf_exempt
+@require_POST
 def add_news_entry_ajax(request):
-    title = strip_tags(request.POST.get("title")) 
-    content = strip_tags(request.POST.get("content"))
-    category = request.POST.get("category")
-    thumbnail = request.POST.get("thumbnail")
-    user = request.user
+    try:
+        # Check if user is authenticated
+        if not request.user.is_authenticated:
+            return JsonResponse({
+                "status": "error",
+                "message": "User not authenticated"
+            }, status=401)
 
-    new_news = News(
-        title=title, 
-        content=content,
-        category=category,
-        thumbnail=thumbnail,
-        user=user
-    )
-    new_news.save()
+        # Get form data
+        title = strip_tags(request.POST.get("title", "").strip())
+        content = strip_tags(request.POST.get("content", "").strip())
+        category = request.POST.get("category", "").strip()
+        thumbnail = request.POST.get("thumbnail", "").strip() or None
 
-    return HttpResponse(b"CREATED", status=201)
+        # Validate required fields
+        if not title:
+            return JsonResponse({
+                "status": "error", 
+                "message": "Title is required"
+            }, status=400)
+        
+        if not content:
+            return JsonResponse({
+                "status": "error",
+                "message": "Content is required" 
+            }, status=400)
+            
+        if not category:
+            return JsonResponse({
+                "status": "error",
+                "message": "Category is required"
+            }, status=400)
 
+        # Create new news item
+        new_news = News(
+            title=title, 
+            content=content,
+            category=category,
+            thumbnail=thumbnail,
+            user=request.user
+        )
+        new_news.save()
+
+        # Return success response
+        return JsonResponse({
+            "status": "success",
+            "message": "News created successfully",
+            "news_id": str(new_news.id)
+        }, status=201)
+
+    except Exception as e:
+        print(f"Error in add_news_entry_ajax: {str(e)}")  # Debug di console
+        return JsonResponse({
+            "status": "error",
+            "message": f"Server error: {str(e)}"
+        }, status=500)
+    
 @csrf_exempt
 def edit_news_entry_ajax(request, id):
     if request.method == "POST":
@@ -96,11 +138,12 @@ def show_json(request):
     data = [
         {
             'id': str(news.id),
+            'user_id': news.user.id if news.user else None,  # tambahkan ini
             'title': news.title,
             'content': news.content,
             'category': news.category,
-            'published_at': news.published_at,
-            'thumbnail': news.thumbnail
+            'thumbnail': news.thumbnail,
+            'created_at': news.published_at.isoformat() if news.published_at else None,  # ganti ke published_at
         }
         for news in news_list
     ]
