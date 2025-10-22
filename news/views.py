@@ -16,6 +16,7 @@ from news.forms import NewsForm
 from django.views.decorators.csrf import csrf_exempt
 from authentication.decorators import login_required_custom
 
+
 @login_required_custom
 def show_news_page(request):
     news_list = News.objects.all()
@@ -25,6 +26,12 @@ def show_news_page(request):
     }
     return render(request, 'news_page.html', context)
 
+def show_news_detail(request, news_id):
+    news = get_object_or_404(News, id=news_id)
+    context = {
+        'news': news,
+    }
+    return render(request, 'news_detail.html', context)
 
 @csrf_exempt
 @require_POST

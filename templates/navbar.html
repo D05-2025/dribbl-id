@@ -1,0 +1,135 @@
+<!-- templates/navbar.html -->
+<nav id="navbar"
+     class="fixed top-0 left-0 right-0 bg-transparent backdrop-blur-md z-50 transition-all duration-500 border-b border-transparent">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <!-- Logo -->
+            <div class="flex-shrink-0">
+                <a href="{% url 'home:show_main' %}"
+                   class="text-2xl font-bold text-white hover:text-blue-300 transition duration-300">
+                    DRIBBL.ID
+                </a>
+            </div>
+
+            <!-- Navigation Links - Center -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="{% url 'home:show_main' %}"
+                   class="text-white hover:text-blue-300 px-3 py-2 text-sm font-medium transition duration-300 relative group">
+                    Home
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="{% url 'news:show_news_page' %}"
+                   class="text-white hover:text-blue-300 px-3 py-2 text-sm font-medium transition duration-300 relative group">
+                    News
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="#"
+                   class="text-white hover:text-blue-300 px-3 py-2 text-sm font-medium transition duration-300 relative group">
+                    Events
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
+                </a>
+            </div>
+
+            <!-- User Menu / Login - Right -->
+            <div class="flex items-center space-x-4">
+                {% if request.session.username %}
+                    <div class="flex items-center space-x-3">
+                        <span class="text-white text-sm font-medium">Hello, {{ request.session.username }}</span>
+                        <form method="POST" action="{% url 'logout' %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                {% else %}
+                    <div class="flex items-center space-x-3">
+                        <a href="{% url 'login' %}"
+                           class="text-white hover:text-blue-300 px-3 py-2 text-sm font-medium transition duration-300">
+                            Login
+                        </a>
+                        <a href="{% url 'register' %}"
+                           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300">
+                            Register
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Mobile menu button -->
+            <div class="md:hidden">
+                <button type="button"
+                        class="text-white hover:text-blue-300 focus:outline-none focus:text-blue-400"
+                        onclick="toggleMobileMenu()">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="md:hidden hidden bg-white/95 backdrop-blur-md border-t border-gray-200">
+        <div class="px-2 pt-2 pb-3 space-y-1">
+            <a href="{% url 'home:show_main' %}"
+               class="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium border-l-4 border-transparent hover:border-blue-600">
+                Home
+            </a>
+            <a href="{% url 'news:show_news_page' %}"
+               class="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium border-l-4 border-transparent hover:border-blue-600">
+                News
+            </a>
+            <a href="#"
+               class="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium border-l-4 border-transparent hover:border-blue-600">
+                Events
+            </a>
+            {% if request.session.username %}
+                <div class="border-t border-gray-200 pt-4 pb-3">
+                    <div class="px-3 text-sm text-gray-500">Hello, {{ request.session.username }}</div>
+                    <form method="POST" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="w-full text-left text-red-600 hover:text-red-800 block px-3 py-2 text-base font-medium">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="border-t border-gray-200 pt-4 pb-3 space-y-2">
+                    <a href="{% url 'login' %}"
+                       class="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
+                        Login
+                    </a>
+                    <a href="{% url 'register' %}"
+                       class="bg-blue-600 hover:bg-blue-700 text-white block px-3 py-2 text-base font-medium rounded-md text-center">
+                        Register
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<script>
+function toggleMobileMenu() {
+    const mobileMenu = document.getElementById('mobileMenu');
+    mobileMenu.classList.toggle('hidden');
+}
+
+// Efek perubahan navbar saat scroll
+window.addEventListener('scroll', () => {
+    const navbar = document.getElementById('navbar');
+    if (window.scrollY > 50) {
+        navbar.classList.add('bg-white', 'shadow-lg', 'border-gray-200');
+        navbar.classList.remove('bg-transparent', 'border-transparent');
+        navbar.querySelectorAll('a').forEach(a => a.classList.replace('text-white', 'text-gray-700'));
+    } else {
+        navbar.classList.add('bg-transparent', 'border-transparent');
+        navbar.classList.remove('bg-white', 'shadow-lg', 'border-gray-200');
+        navbar.querySelectorAll('a').forEach(a => a.classList.replace('text-gray-700', 'text-white'));
+    }
+});
+</script>

@@ -43,7 +43,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'authentication',
     'news',
+    'home',
 ]
+
+LOGIN_REDIRECT_URL = '/'  
+LOGOUT_REDIRECT_URL = '/'  
+LOGIN_URL = '/auth/login/' 
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
