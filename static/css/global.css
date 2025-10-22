@@ -1,0 +1,60 @@
+.form-style form input,
+.form-style form textarea,
+.form-style form select {
+    /* Umum: Input, Textarea, Select */
+    width: 100%;
+    padding: 0.5rem;
+    border: 2px solid #555555; /* Border abu-abu gelap */
+    border-radius: 0.375rem;
+    color: #333333; /* Warna teks */
+}
+
+.form-style form input:focus,
+.form-style form textarea:focus,
+.form-style form select:focus {
+    /* Focus State: Border dan Shadow menjadi hitam */
+    outline: none;
+    border-color: #000000; /* Border hitam saat fokus */
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.5); /* Shadow hitam transparan */
+}
+
+/* --- Checkbox Styling --- */
+
+.form-style input[type="checkbox"] {
+    width: 1.25rem;
+    height: 1.25rem;
+    padding: 0;
+    border: 2px solid #999999; /* Border abu-abu saat normal */
+    border-radius: 0.375rem;
+    background-color: white;
+    cursor: pointer;
+    position: relative;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.form-style input[type="checkbox"]:checked {
+    /* Checked State: Background dan Border menjadi hitam */
+    background-color: #000000;
+    border-color: #000000;
+}
+
+.form-style input[type="checkbox"]:checked::after {
+    /* Checkmark: Tetap putih untuk kontras */
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    font-size: 0.875rem;
+}
+
+.form-style input[type="checkbox"]:focus {
+    /* Checkbox Focus State */
+    outline: none;
+    border-color: #000000; /* Border hitam saat fokus */
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.15); /* Shadow hitam yang lebih halus */
+}
