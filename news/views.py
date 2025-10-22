@@ -37,20 +37,23 @@ def show_news_detail(request, news_id):
 @require_POST
 def add_news_entry_ajax(request):
     try:
-        # Check if user is authenticated
         if not request.user.is_authenticated:
             return JsonResponse({
                 "status": "error",
                 "message": "User not authenticated"
             }, status=401)
 
-        # Get form data
+        if request.user.role != 'admin':
+            return JsonResponse({
+                "status": "error",
+                "message": "Only admin users can create news"
+            }, status=403)
+
         title = strip_tags(request.POST.get("title", "").strip())
         content = strip_tags(request.POST.get("content", "").strip())
         category = request.POST.get("category", "").strip()
         thumbnail = request.POST.get("thumbnail", "").strip() or None
 
-        # Validate required fields
         if not title:
             return JsonResponse({
                 "status": "error", 
@@ -69,7 +72,6 @@ def add_news_entry_ajax(request):
                 "message": "Category is required"
             }, status=400)
 
-        # Create new news item
         new_news = News(
             title=title, 
             content=content,
@@ -79,7 +81,6 @@ def add_news_entry_ajax(request):
         )
         new_news.save()
 
-        # Return success response
         return JsonResponse({
             "status": "success",
             "message": "News created successfully",
@@ -87,42 +88,30 @@ def add_news_entry_ajax(request):
         }, status=201)
 
     except Exception as e:
-        print(f"Error in add_news_entry_ajax: {str(e)}")  # Debug di console
+        print(f"Error in add_news_entry_ajax: {str(e)}")
         return JsonResponse({
             "status": "error",
             "message": f"Server error: {str(e)}"
         }, status=500)
-    
+
 @csrf_exempt
-def edit_news_entry_ajax(request, id):
+def delete_news_ajax(request, id):
+    if not request.user.is_authenticated:
+        return JsonResponse({"status": "error", "message": "User not authenticated"}, status=401)
+    
     if request.method == "POST":
         news = get_object_or_404(News, pk=id)
+        
+        if request.user.role != 'admin' and news.user != request.user:
+            return JsonResponse({"status": "error", "message": "Permission denied"}, status=403)
 
-        title = strip_tags(request.POST.get("title"))
-        content = strip_tags(request.POST.get("content"))
-        category = request.POST.get("category")
-        thumbnail = request.POST.get("thumbnail")
-        is_featured = request.POST.get("is_featured") == 'on'
-
-        news.title = title
-        news.content = content
-        news.category = category
-        news.thumbnail = thumbnail
-        news.is_featured = is_featured
-
-        news.save()
-
-        return HttpResponse(b"UPDATED", status=200)
+        try:
+            news.delete()
+            return JsonResponse({"status": "success", "message": "News deleted successfully"})
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
     else:
-        return HttpResponse(b"INVALID_METHOD", status=405)
-
-@csrf_exempt
-@require_POST
-def delete_news_ajax(request, id):
-    news = get_object_or_404(News, pk=id)
-    news.delete()
-    return JsonResponse({"message": "News deleted successfully"})
-
+        return JsonResponse({"status": "error", "message": "Invalid method"}, status=405)
 
 def show_xml(request):
     news = News.objects.all()
@@ -152,6 +141,53 @@ def show_json(request):
         for news in news_list
     ]
     return JsonResponse(data, safe=False)
+
+@csrf_exempt
+def edit_news_entry_ajax(request, id):
+    if not request.user.is_authenticated:
+        return JsonResponse({"status": "error", "message": "User not authenticated"}, status=401)
+    
+    news = get_object_or_404(News, pk=id)
+    
+    if request.user.role != 'admin' and news.user != request.user:
+        return JsonResponse({"status": "error", "message": "Permission denied"}, status=403)
+
+    if request.method == "POST":
+        try:
+            title = strip_tags(request.POST.get("title"))
+            content = strip_tags(request.POST.get("content"))
+            category = request.POST.get("category")
+            thumbnail = request.POST.get("thumbnail")
+            is_featured = request.POST.get("is_featured") == 'on'
+
+            news.title = title
+            news.content = content
+            news.category = category
+            news.thumbnail = thumbnail
+            news.is_featured = is_featured
+
+            news.save()
+
+            return JsonResponse({"status": "success", "message": "News updated successfully"})
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    
+    else:
+        return JsonResponse({"status": "error", "message": "Invalid method"}, status=405)
+
+# View untuk get news data (untuk form edit)
+def get_news_json(request, id):
+    news = get_object_or_404(News, pk=id)
+    news_data = {
+        'id': str(news.id),
+        'title': news.title,
+        'content': news.content,
+        'category': news.category,
+        'thumbnail': news.thumbnail,
+        'is_featured': news.is_featured,
+        'user_id': str(news.user.id)
+    }
+    return JsonResponse(news_data)
 
 def show_json_by_id(request, news_id):
     try:

@@ -15,17 +15,11 @@
       <p class="text-gray-600">Stay updated with the latest basketball stories and analysis</p>
     </div>
 
-    <!-- Button section -->
+    {% if user.is_authenticated and user.role == 'admin' %}
     <button onclick="showModal()" class="inline-flex items-center px-4 py-2 bg-white text-blue-600 font-semibold outline outline-2 outline-blue-600 outline-offset-[-2px] rounded-md hover:bg-blue-600 hover:text-white transition-colors mb-4">
       Create News
     </button>
-
-    <!-- Filter Section -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 bg-white rounded-lg border border-gray-200 p-4">
-      <!-- {% if user.is_authenticated %} -->
-        <div class="text-sm text-gray-500">Last login: {{ last_login }}</div>
-      {% endif %}
-    </div>
+    {% endif %}
 
     <!-- Loading State -->
     <div id="loading" class="bg-white rounded-lg border border-gray-200 p-12 text-center hidden">
@@ -52,7 +46,7 @@
   </div>
 </div>
 
-<!-- MODAL HARUS DITAMBAHKIN DI SINI -->
+<!-- CREATE MODAL -->
 <div id="crudModal" class="hidden fixed inset-0 z-50 w-full flex items-center justify-center bg-gray-800 bg-opacity-50">
   <div id="crudModalContent" class="bg-white rounded-lg shadow-lg w-5/6 sm:w-3/5 md:w-1/2 lg:w-2/5 xl:w-1/3 max-h-screen overflow-y-auto">
     <!-- Modal header -->
@@ -108,6 +102,62 @@
   </div>
 </div>
 
+<!-- EDIT MODAL -->
+<div id="editModal" class="hidden fixed inset-0 z-50 w-full flex items-center justify-center bg-gray-800 bg-opacity-50">
+  <div class="bg-white rounded-lg shadow-lg w-5/6 sm:w-3/5 md:w-1/2 lg:w-2/5 xl:w-1/3 max-h-screen overflow-y-auto">
+    <!-- Modal header -->
+    <div class="flex items-center justify-between p-4 border-b">
+      <div>
+        <h3 class="text-xl font-semibold text-gray-900">
+          Edit Basketball News
+        </h3>
+        <p class="text-sm text-gray-600 mt-1">Update your basketball news</p>
+      </div>
+      <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" onclick="hideEditModal()">
+        <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+        </svg>
+        <span class="sr-only">Close modal</span>
+      </button>
+    </div>
+    <!-- Modal body -->
+    <div class="px-6 py-4 space-y-4">
+      <form id="edit-news-form" onsubmit="submitEditForm(event)">
+        {% csrf_token %}
+        <div class="mb-4">
+          <label for="edit-title" class="block text-sm font-medium text-gray-700">Title</label>
+          <input type="text" id="edit-title" name="title" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter news title" required>
+        </div>
+        <div class="mb-4">
+          <label for="edit-content" class="block text-sm font-medium text-gray-700">Content</label>
+          <textarea id="edit-content" name="content" rows="4" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter news content" required></textarea>
+        </div>
+        <div class="mb-4">
+          <label for="edit-category" class="block text-sm font-medium text-gray-700">Category</label>
+          <select id="edit-category" name="category" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            <option value="">Choose a category</option>
+            <option value="nba">NBA</option>
+            <option value="ibl">IBL</option>
+            <option value="fiba">FIBA</option>
+            <option value="transfer">Transfers & Trades</option>
+            <option value="highlight">Game Highlights</option>
+            <option value="analysis">Team & Player Analysis</option>
+          </select>
+        </div>
+        <div class="mb-4">
+          <label for="edit-thumbnail" class="block text-sm font-medium text-gray-700">Thumbnail URL</label>
+          <input type="url" id="edit-thumbnail" name="thumbnail" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="https://example.com/image.jpg">
+        </div>
+      </form>
+    </div>
+    <!-- Modal footer -->
+    <div class="flex flex-col sm:flex-row gap-4 p-6 border-t border-gray-200 rounded-b">
+      <button type="button" class="order-2 sm:order-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition-colors text-center" onclick="hideEditModal()">Cancel</button>
+      <button type="submit" form="edit-news-form" class="order-1 sm:order-2 flex-1 bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 transition-colors">Update News</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // Configuration
 const NEWS_API_ENDPOINT = "{% url 'news:show_json' %}";
@@ -123,7 +173,7 @@ const newsGridContainer = document.getElementById('grid');
 let activeFilter = 'all';
 let allNewsData = [];
 
-// ==================== MODAL FUNCTIONS ====================
+// ==================== CREATE MODAL FUNCTIONS ====================
 function showModal() {
   const modal = document.getElementById('crudModal');
   const modalContent = document.getElementById('crudModalContent');
@@ -147,31 +197,113 @@ function hideModal() {
   }, 150); 
 }
 
-// Form submission dengan AJAX
-async function addNewsEntry() {
+// ==================== EDIT MODAL FUNCTIONS ====================
+function showEditModal() {
+  const modal = document.getElementById('editModal');
+  modal.classList.remove('hidden');
+}
+
+function hideEditModal() {
+  const modal = document.getElementById('editModal');
+  modal.classList.add('hidden');
+  document.getElementById('edit-news-form').reset();
+}
+
+// ==================== EDIT FUNCTION ====================
+async function editNews(newsId) {
   try {
-    const response = await fetch("{% url 'news:add_news_entry_ajax' %}", {
-      method: "POST",
-      body: new FormData(document.querySelector('#newsForm')),
-    });
+    // Fetch data news yang akan diedit
+    const response = await fetch(`/get-news-json/${newsId}/`);
+    const newsData = await response.json();
 
     if (response.ok) {
-      document.getElementById("newsForm").reset();
-      hideModal();
+      // Isi form dengan data yang ada
+      document.getElementById('edit-title').value = newsData.title || '';
+      document.getElementById('edit-content').value = newsData.content || '';
+      document.getElementById('edit-category').value = newsData.category || '';
+      document.getElementById('edit-thumbnail').value = newsData.thumbnail || '';
       
-      // Show success message
-      showToast('News added successfully!', '', 'success');
-
-      // Refresh news list
-      document.dispatchEvent(new CustomEvent('newsAdded'));
+      // Set news ID untuk form submission
+      document.getElementById('edit-news-form').dataset.newsId = newsId;
+      
+      // Show modal
+      showEditModal();
     } else {
-      throw new Error('Failed to add news');
+      throw new Error('Failed to fetch news data');
     }
   } catch (error) {
-    console.error('Error adding news:', error);
-    showToast('Failed to add news. Please try again.', '', 'error');
+    console.error('Error fetching news data:', error);
+    showToast('Failed to load news data', 'Please try again', 'error');
   }
+}
+
+// Function untuk submit edit form
+async function submitEditForm(event) {
+  event.preventDefault();
   
+  const newsId = event.target.dataset.newsId;
+  const formData = new FormData(event.target);
+  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+  try {
+    const response = await fetch(`/edit-news-ajax/${newsId}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrfToken,
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: formData
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.status === 'success') {
+      showToast('News updated successfully!', '', 'success');
+      hideEditModal();
+      // Refresh news list
+      document.dispatchEvent(new CustomEvent('newsAdded'));
+    } else if (response.status === 403) {
+      showToast('Permission denied', 'You cannot edit this news', 'error');
+    } else if (response.status === 401) {
+      showToast('Authentication required', 'Please login to edit news', 'error');
+    } else {
+      throw new Error(result.message || 'Failed to update news');
+    }
+  } catch (error) {
+    console.error('Error updating news:', error);
+    showToast('Failed to update news', error.message, 'error');
+  }
+}
+
+// ==================== CREATE FUNCTION ====================
+async function addNewsEntry() {
+  try {
+    const formData = new FormData(document.querySelector('#newsForm'));
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    const response = await fetch("{% url 'news:add_news_entry_ajax' %}", {
+      method: "POST",
+      headers: {
+        'X-CSRFToken': csrfToken,
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body: formData
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.status === 'success') {
+      document.getElementById("newsForm").reset();
+      hideModal();
+      showToast('News added successfully!', '', 'success');
+      document.dispatchEvent(new CustomEvent('newsAdded'));
+    } else {
+      throw new Error(result.message || 'Failed to add news');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showToast('Failed to add news', error.message, 'error');
+  }
   return false;
 }
 
@@ -183,7 +315,6 @@ document.getElementById("newsForm").addEventListener("submit", function(e) {
 
 // Simple toast notification
 function showToast(title, message, type = 'info') {
-  // Buat element toast sederhana
   const toast = document.createElement('div');
   toast.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg border-l-4 max-w-sm z-50 ${
     type === 'success' ? 'bg-green-50 border-green-500 text-green-700' :
@@ -198,12 +329,10 @@ function showToast(title, message, type = 'info') {
   
   document.body.appendChild(toast);
   
-  // Auto remove setelah 5 detik
   setTimeout(() => {
     toast.remove();
   }, 5000);
 }
-// ==================== END MODAL FUNCTIONS ====================
 
 // Show/hide page sections
 function displayPageSection({ showLoading = false, showError = false, showEmpty = false, showGrid = false }) {
@@ -212,7 +341,6 @@ function displayPageSection({ showLoading = false, showError = false, showEmpty 
   emptyStateDisplay.classList.toggle('hidden', !showEmpty);
   newsGridContainer.classList.toggle('hidden', !showGrid);
   
-  // Add grid classes when showing grid
   if (showGrid) {
     newsGridContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
   }
@@ -236,7 +364,6 @@ function buildNewsCardElement(item) {
     article.className = 'bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300 overflow-hidden flex flex-col h-full';
 
     const linkDetail = `{% url 'news:show_news_detail' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', item.id);
-    const linkEdit = `{% url 'news:edit_news_entry_ajax' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', item.id);
     const linkDelete = `{% url 'news:delete_news_ajax' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', item.id);
 
     const title = DOMPurify.sanitize(item.title);
@@ -254,10 +381,14 @@ function buildNewsCardElement(item) {
     );
     const categoryLabel = DOMPurify.sanitize(getReadableCategoryName(category));
 
-    const editDeleteHtml = CURRENT_USER_ID && Number(CURRENT_USER_ID) === Number(item.user_id)
+    // ✅ EDIT pakai AJAX, DELETE tetap biasa
+    const canEditDelete = CURRENT_USER_ID && 
+        (Number(CURRENT_USER_ID) === Number(item.user_id) || "{{ user.role }}" === 'admin');
+
+    const editDeleteHtml = canEditDelete
         ? `<div class='flex space-x-2'>
-            <a href='${linkEdit}' class='text-gray-600 hover:text-gray-700 text-sm transition-colors'>Edit</a>
-            <a href='${linkDelete}' class='text-red-600 hover:text-red-700 text-sm transition-colors' onclick='return confirm("Are you sure you want to delete this article?")'>Delete</a>
+            <button onclick="editNews('${item.id}')" class="text-gray-600 hover:text-gray-700 text-sm transition-colors">Edit</button>
+            <a href="${linkDelete}" class="text-red-600 hover:text-red-700 text-sm transition-colors" onclick="return confirm('Are you sure you want to delete this article?')">Delete</a>
           </div>`
         : '';
 
@@ -344,39 +475,8 @@ function initializeNewsPage() {
 initializeNewsPage();
 
 document.addEventListener('newsAdded', function() {
-    // Refresh data without page reload
     fetchNewsFromServer();
 });
-
-async function addNewsEntry() {
-  try {
-    const formData = new FormData(document.querySelector('#newsForm'));
-    
-    const response = await fetch("{% url 'news:add_news_entry_ajax' %}", {
-      method: "POST",
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-      },
-      body: formData
-    });
-
-    const result = await response.json();
-    console.log('Server response:', result);
-
-    if (response.ok && result.status === 'success') {
-      document.getElementById("newsForm").reset();
-      hideModal();
-      showToast('News added successfully!', '', 'success');
-      document.dispatchEvent(new CustomEvent('newsAdded'));
-    } else {
-      throw new Error(result.message || 'Failed to add news');
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    showToast('Failed to add news', error.message, 'error');
-  }
-  return false;
-}
 </script>
 
 {% endblock content %}
