@@ -4,128 +4,170 @@
 {% block meta %}
 <title>DRIBBL.ID</title>
 <style>
-    /* Override background dan styling */
     body {
         background-color: #000 !important;
         color: #fff;
-        font-family: 'Courier New', monospace;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        overflow: hidden;
         margin: 0;
         padding: 0;
+        overflow-x: hidden;
     }
-    
-    .container {
-        text-align: center;
-        max-width: 800px;
-        padding: 20px;
-        margin-top: -2rem; /* Adjust untuk navbar fixed */
+
+    .hero-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 6rem 3rem;
+        background: #000 !important;
     }
-    
-    .welcome-text {
-        font-size: 3rem;
-        margin-bottom: 20px;
-        white-space: nowrap;
-        overflow: hidden;
-        border-right: 2px solid #fff;
-        width: 0;
-        animation: typing 4s steps(30) 1s forwards, blink 0.75s step-end infinite;
+
+    .hero-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5rem;
+        max-width: 1200px;
+        width: 100%;
+        position: relative;
     }
-    
-    @keyframes typing {
-        from { width: 0; }
-        to { width: 100%; }
+
+    .hero-image {
+        flex: 0 0 600px;
+        display: flex;
+        justify-content: center;
     }
-    
+
+    .hero-image img {
+        width: 600px;
+        height: auto;
+        object-fit: contain;
+        filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.2));
+        transition: transform 0.4s ease;
+    }
+
+    .hero-image img:hover {
+        transform: scale(1.05);
+    }
+
+    .hero-text {
+        flex: 1;
+        min-width: 300px;
+        max-width: 600px;
+        word-wrap: break-word;
+        position: relative;
+    }
+
+    /* Efek ketik */
+    .type-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        line-height: 1.2;
+        display: inline;
+        position: relative;
+        text-transform: lowercase;
+        /* PASTIKAN TIDAK ADA white-space: pre DI SINI */
+    }
+
+    .cursor {
+        display: inline-block;
+        width: 4px;
+        height: 2rem;  /* Sesuai dengan line-height teks */
+        background-color: #fff;
+        margin-left: 4px;
+        animation: blink 0.75s step-end infinite;
+        vertical-align: middle;
+        margin-bottom: -0.5rem; /* Sedikit adjust vertical alignment */
+    }
+
     @keyframes blink {
-        from, to { border-color: transparent; }
-        50% { border-color: #fff; }
+        50% { opacity: 0; }
     }
-    
-    .subtitle {
-        font-size: 1.5rem;
-        opacity: 0;
-        animation: fadeIn 1s ease 5s forwards;
-        margin-top: 20px;
+
+    /* Fade-in deskripsi */
+    .hero-text p {
+        font-size: 1.1rem;
         color: #ccc;
+        line-height: 1.6;
+        margin-top: 20px;
+        opacity: 0;
+        animation: fadeIn 1.5s ease forwards;
+        animation-delay: 4.5s;
     }
-    
+
     @keyframes fadeIn {
         from { opacity: 0; }
         to { opacity: 1; }
     }
-    
-    /* Responsive design */
-    @media (max-width: 768px) {
-        .welcome-text {
+
+    @media (max-width: 900px) {
+        .hero-container {
+            flex-direction: column;
+            text-align: center;
+        }
+        .hero-image img {
+            width: 250px;
+        }
+        .type-title {
             font-size: 2rem;
         }
-        
-        .subtitle {
-            font-size: 1.2rem;
-        }
-        
-        .container {
-            margin-top: 0;
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .welcome-text {
-            font-size: 1.5rem;
-        }
-        
-        .subtitle {
-            font-size: 1rem;
+        .cursor {
+            height: 2rem; /* Sesuaikan dengan font size mobile */
         }
     }
 </style>
 {% endblock meta %}
 
 {% block content %}
-<div class="container">
-    <h1 class="welcome-text">Welcome to DRIBBL.ID</h1>
-    <p class="subtitle">Biggest Basketball Community in Indonesia</p>
+<div class="hero-section">
+    <div class="hero-container">
+        <div class="hero-image">
+            <img src="{% static 'images/basketball.png' %}" alt="Basketball">
+        </div>
+        <div class="hero-text">
+            <h1 class="type-title"></h1><span class="cursor"></span>
+            <p>Indonesia's biggest basketball community! A place where passion meets the court, and every dribble, dunk, and dream matters.</p>
+        </div>
+    </div>
 </div>
 
 <script>
-    const welcomeText = document.querySelector('.welcome-text');
-    let audioContext;
-    let oscillator;
-    
-    function playTypeSound() {
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    document.addEventListener("DOMContentLoaded", function () {
+        const titleText = "welcome to dribbl.id";
+        const titleElement = document.querySelector(".type-title");
+        const cursor = document.querySelector(".cursor");
+        let i = 0;
+        let audioContext;
+
+        function playTypeSound() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(900, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.1);
         }
-        
-        oscillator = audioContext.createOscillator();
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-        
-        const gainNode = audioContext.createGain();
-        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 0.1);
-    }
-    
-    // Simulasi suara ketik dengan interval
-    const text = "Welcome to DRIBBL.ID";
-    let i = 0;
-    const typeInterval = setInterval(() => {
-        if (i < text.length) {
-            playTypeSound();
-            i++;
-        } else {
-            clearInterval(typeInterval);
+
+        function typeEffect() {
+            if (i < titleText.length) {
+                // PASTIKAN pakai textContent, bukan appendChild
+                titleElement.textContent = titleText.substring(0, i + 1);
+                
+                if (titleText.charAt(i) !== ' ') playTypeSound();
+
+                i++;
+                setTimeout(typeEffect, 100);
+            }
+            // Biarkan cursor tetap berkedip
         }
-    }, 150);
+
+        typeEffect();
+    });
 </script>
 {% endblock content %}
