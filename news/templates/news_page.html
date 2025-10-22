@@ -15,11 +15,11 @@
       <p class="text-gray-600">Stay updated with the latest basketball stories and analysis</p>
     </div>
 
-    {% if user.is_authenticated and user.role == 'admin' %}
-    <button onclick="showModal()" class="inline-flex items-center px-4 py-2 bg-white text-blue-600 font-semibold outline outline-2 outline-blue-600 outline-offset-[-2px] rounded-md hover:bg-blue-600 hover:text-white transition-colors mb-4">
-      Create News
-    </button>
-    {% endif %}
+  {% if user.is_authenticated and user.role == 'admin' %}
+  <button onclick="showModal()" class="inline-flex items-center px-4 py-2 bg-white text-blue-600 font-semibold outline outline-2 outline-blue-600 outline-offset-[-2px] rounded-md hover:bg-blue-600 hover:text-white transition-colors mb-4">
+    Create News
+  </button>
+  {% endif %}
 
     <!-- Loading State -->
     <div id="loading" class="bg-white rounded-lg border border-gray-200 p-12 text-center hidden">
@@ -49,12 +49,9 @@
 <!-- CREATE MODAL -->
 <div id="crudModal" class="hidden fixed inset-0 z-50 w-full flex items-center justify-center bg-gray-800 bg-opacity-50">
   <div id="crudModalContent" class="bg-white rounded-lg shadow-lg w-5/6 sm:w-3/5 md:w-1/2 lg:w-2/5 xl:w-1/3 max-h-screen overflow-y-auto">
-    <!-- Modal header -->
     <div class="flex items-center justify-between p-4 border-b">
       <div>
-        <h3 class="text-xl font-semibold text-gray-900">
-          Create Basketball News
-        </h3>
+        <h3 class="text-xl font-semibold text-gray-900">Create Basketball News</h3>
         <p class="text-sm text-gray-600 mt-1">Share your basketball news with the community</p>
       </div>
       <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" onclick="hideModal()">
@@ -64,7 +61,6 @@
         <span class="sr-only">Close modal</span>
       </button>
     </div>
-    <!-- Modal body -->
     <div class="px-6 py-4 space-y-4">
       <form id="newsForm">
         {% csrf_token %}
@@ -94,7 +90,6 @@
         </div>
       </form>
     </div>
-    <!-- Modal footer -->
     <div class="flex flex-col sm:flex-row gap-4 p-6 border-t border-gray-200 rounded-b">
       <button type="button" class="order-2 sm:order-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition-colors text-center" onclick="hideModal()">Cancel</button>
       <button type="submit" form="newsForm" class="order-1 sm:order-2 flex-1 bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 transition-colors">Publish News</button>
@@ -105,12 +100,9 @@
 <!-- EDIT MODAL -->
 <div id="editModal" class="hidden fixed inset-0 z-50 w-full flex items-center justify-center bg-gray-800 bg-opacity-50">
   <div class="bg-white rounded-lg shadow-lg w-5/6 sm:w-3/5 md:w-1/2 lg:w-2/5 xl:w-1/3 max-h-screen overflow-y-auto">
-    <!-- Modal header -->
     <div class="flex items-center justify-between p-4 border-b">
       <div>
-        <h3 class="text-xl font-semibold text-gray-900">
-          Edit Basketball News
-        </h3>
+        <h3 class="text-xl font-semibold text-gray-900">Edit Basketball News</h3>
         <p class="text-sm text-gray-600 mt-1">Update your basketball news</p>
       </div>
       <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" onclick="hideEditModal()">
@@ -120,17 +112,16 @@
         <span class="sr-only">Close modal</span>
       </button>
     </div>
-    <!-- Modal body -->
     <div class="px-6 py-4 space-y-4">
       <form id="edit-news-form" onsubmit="submitEditForm(event)">
         {% csrf_token %}
         <div class="mb-4">
           <label for="edit-title" class="block text-sm font-medium text-gray-700">Title</label>
-          <input type="text" id="edit-title" name="title" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter news title" required>
+          <input type="text" id="edit-title" name="title" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
         </div>
         <div class="mb-4">
           <label for="edit-content" class="block text-sm font-medium text-gray-700">Content</label>
-          <textarea id="edit-content" name="content" rows="4" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter news content" required></textarea>
+          <textarea id="edit-content" name="content" rows="4" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
         </div>
         <div class="mb-4">
           <label for="edit-category" class="block text-sm font-medium text-gray-700">Category</label>
@@ -150,7 +141,6 @@
         </div>
       </form>
     </div>
-    <!-- Modal footer -->
     <div class="flex flex-col sm:flex-row gap-4 p-6 border-t border-gray-200 rounded-b">
       <button type="button" class="order-2 sm:order-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition-colors text-center" onclick="hideEditModal()">Cancel</button>
       <button type="submit" form="edit-news-form" class="order-1 sm:order-2 flex-1 bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 transition-colors">Update News</button>
@@ -173,11 +163,19 @@ const newsGridContainer = document.getElementById('grid');
 let activeFilter = 'all';
 let allNewsData = [];
 
+// ==================== HELPER FUNCTION untuk CSRF Token ====================
+function getCSRFToken() {
+  const token = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+  if (!token) {
+    console.error('CSRF token not found');
+  }
+  return token;
+}
+
 // ==================== CREATE MODAL FUNCTIONS ====================
 function showModal() {
   const modal = document.getElementById('crudModal');
   const modalContent = document.getElementById('crudModalContent');
-
   modal.classList.remove('hidden'); 
   setTimeout(() => {
     modalContent.classList.remove('opacity-0', 'scale-95');
@@ -188,12 +186,11 @@ function showModal() {
 function hideModal() {
   const modal = document.getElementById('crudModal');
   const modalContent = document.getElementById('crudModalContent');
-
   modalContent.classList.remove('opacity-100', 'scale-100');
   modalContent.classList.add('opacity-0', 'scale-95');
-
   setTimeout(() => {
     modal.classList.add('hidden');
+    document.getElementById('newsForm').reset();
   }, 150); 
 }
 
@@ -212,21 +209,15 @@ function hideEditModal() {
 // ==================== EDIT FUNCTION ====================
 async function editNews(newsId) {
   try {
-    // Fetch data news yang akan diedit
-    const response = await fetch(`/get-news-json/${newsId}/`);
+    const response = await fetch(`/news/get-news-json/${newsId}/`);
     const newsData = await response.json();
 
     if (response.ok) {
-      // Isi form dengan data yang ada
       document.getElementById('edit-title').value = newsData.title || '';
       document.getElementById('edit-content').value = newsData.content || '';
       document.getElementById('edit-category').value = newsData.category || '';
       document.getElementById('edit-thumbnail').value = newsData.thumbnail || '';
-      
-      // Set news ID untuk form submission
       document.getElementById('edit-news-form').dataset.newsId = newsId;
-      
-      // Show modal
       showEditModal();
     } else {
       throw new Error('Failed to fetch news data');
@@ -237,21 +228,16 @@ async function editNews(newsId) {
   }
 }
 
-// Function untuk submit edit form
+// ==================== SUBMIT EDIT FORM ====================
 async function submitEditForm(event) {
   event.preventDefault();
   
   const newsId = event.target.dataset.newsId;
   const formData = new FormData(event.target);
-  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
   try {
-    const response = await fetch(`/edit-news-ajax/${newsId}/`, {
+    const response = await fetch(`/news/edit-news-ajax/${newsId}/`, {
       method: 'POST',
-      headers: {
-        'X-CSRFToken': csrfToken,
-        'X-Requested-With': 'XMLHttpRequest'
-      },
       body: formData
     });
 
@@ -260,8 +246,7 @@ async function submitEditForm(event) {
     if (response.ok && result.status === 'success') {
       showToast('News updated successfully!', '', 'success');
       hideEditModal();
-      // Refresh news list
-      document.dispatchEvent(new CustomEvent('newsAdded'));
+      fetchNewsFromServer();
     } else if (response.status === 403) {
       showToast('Permission denied', 'You cannot edit this news', 'error');
     } else if (response.status === 401) {
@@ -275,11 +260,46 @@ async function submitEditForm(event) {
   }
 }
 
-// ==================== CREATE FUNCTION ====================
+// ==================== DELETE FUNCTION ====================
+async function deleteNews(newsId) {
+  if (!confirm('Are you sure you want to delete this article?')) {
+    return;
+  }
+
+  try {
+    const csrfToken = getCSRFToken();
+    
+    const response = await fetch(`/news/delete-news-ajax/${newsId}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrfToken,
+        'Content-Type': 'application/json',
+      }
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.status === 'success') {
+      showToast('News deleted successfully!', '', 'success');
+      fetchNewsFromServer();
+    } else if (response.status === 403) {
+      showToast('Permission denied', 'You cannot delete this news', 'error');
+    } else if (response.status === 401) {
+      showToast('Authentication required', 'Please login to delete news', 'error');
+    } else {
+      throw new Error(result.message || 'Failed to delete news');
+    }
+  } catch (error) {
+    console.error('Error deleting news:', error);
+    showToast('Failed to delete news', error.message, 'error');
+  }
+}
+
+// ==================== ADD NEWS FUNCTION ====================
 async function addNewsEntry() {
   try {
     const formData = new FormData(document.querySelector('#newsForm'));
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const csrfToken = getCSRFToken();
     
     const response = await fetch("{% url 'news:add_news_entry_ajax' %}", {
       method: "POST",
@@ -296,7 +316,7 @@ async function addNewsEntry() {
       document.getElementById("newsForm").reset();
       hideModal();
       showToast('News added successfully!', '', 'success');
-      document.dispatchEvent(new CustomEvent('newsAdded'));
+      fetchNewsFromServer();
     } else {
       throw new Error(result.message || 'Failed to add news');
     }
@@ -313,7 +333,7 @@ document.getElementById("newsForm").addEventListener("submit", function(e) {
   addNewsEntry();
 });
 
-// Simple toast notification
+// ==================== TOAST NOTIFICATION ====================
 function showToast(title, message, type = 'info') {
   const toast = document.createElement('div');
   toast.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg border-l-4 max-w-sm z-50 ${
@@ -334,7 +354,7 @@ function showToast(title, message, type = 'info') {
   }, 5000);
 }
 
-// Show/hide page sections
+// ==================== PAGE DISPLAY FUNCTIONS ====================
 function displayPageSection({ showLoading = false, showError = false, showEmpty = false, showGrid = false }) {
   loadingSpinner.classList.toggle('hidden', !showLoading);
   errorMessage.classList.toggle('hidden', !showError);
@@ -346,7 +366,7 @@ function displayPageSection({ showLoading = false, showError = false, showEmpty 
   }
 }
 
-// Get readable category name
+// ==================== CATEGORY HELPER ====================
 function getReadableCategoryName(categoryCode) {
   const categoryMapping = {
     'nba': 'NBA',
@@ -359,12 +379,12 @@ function getReadableCategoryName(categoryCode) {
   return categoryMapping[categoryCode] || categoryCode;
 }
 
+// ==================== BUILD NEWS CARD ====================
 function buildNewsCardElement(item) {
     const article = document.createElement('article');
     article.className = 'bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300 overflow-hidden flex flex-col h-full';
 
-    const linkDetail = `{% url 'news:show_news_detail' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', item.id);
-    const linkDelete = `{% url 'news:delete_news_ajax' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', item.id);
+    const linkDetail = `/news/detail/${item.id}/`;
 
     const title = DOMPurify.sanitize(item.title);
     const content = DOMPurify.sanitize(item.content);
@@ -376,19 +396,18 @@ function buildNewsCardElement(item) {
         day: 'numeric' 
     }));
 
-    const thumbnailHtml = DOMPurify.sanitize(
-        item.thumbnail ? `<img src='${thumbnail}' alt='${title}' class='w-full h-full object-cover'>` : `<div class='w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center'></div>`
-    );
+    const thumbnailHtml = item.thumbnail 
+        ? `<img src='${thumbnail}' alt='${title}' class='w-full h-full object-cover'>` 
+        : `<div class='w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center'></div>`;
+    
     const categoryLabel = DOMPurify.sanitize(getReadableCategoryName(category));
 
-    // ✅ EDIT pakai AJAX, DELETE tetap biasa
-    const canEditDelete = CURRENT_USER_ID && 
-        (Number(CURRENT_USER_ID) === Number(item.user_id) || "{{ user.role }}" === 'admin');
-
+    const canEditDelete = "{{ user.role }}" === 'admin';
+    
     const editDeleteHtml = canEditDelete
         ? `<div class='flex space-x-2'>
             <button onclick="editNews('${item.id}')" class="text-gray-600 hover:text-gray-700 text-sm transition-colors">Edit</button>
-            <a href="${linkDelete}" class="text-red-600 hover:text-red-700 text-sm transition-colors" onclick="return confirm('Are you sure you want to delete this article?')">Delete</a>
+            <button onclick="deleteNews('${item.id}')" class="text-red-600 hover:text-red-700 text-sm transition-colors">Delete</button>
           </div>`
         : '';
 
@@ -402,8 +421,6 @@ function buildNewsCardElement(item) {
         <div class="p-5 flex flex-col flex-1">
           <div class="flex items-center text-sm text-gray-500 mb-3">
             <time>${createdAt}</time>
-            <span class="mx-2">•</span>
-            <span>${item.views || 0} views</span>
           </div>
           <h3 class="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 leading-tight">
             <a href="${linkDetail}" class="hover:text-blue-600 transition-colors">${title}</a>
@@ -420,7 +437,7 @@ function buildNewsCardElement(item) {
     return article;
 }
 
-// Render all news cards
+// ==================== RENDER CARDS ====================
 function renderAllNewsCards(newsItems) {
   newsGridContainer.innerHTML = '';
   newsItems.forEach(newsItem => {
@@ -429,7 +446,7 @@ function renderAllNewsCards(newsItems) {
   });
 }
 
-// Filter and display news
+// ==================== FILTER AND DISPLAY ====================
 function filterAndDisplayNews() {
   const filteredNews = activeFilter === 'all' 
     ? allNewsData 
@@ -443,7 +460,7 @@ function filterAndDisplayNews() {
   }
 }
 
-// Fetch news data from server
+// ==================== FETCH NEWS ====================
 async function fetchNewsFromServer() {
   try {
     displayPageSection({ showLoading: true });
@@ -466,17 +483,12 @@ async function fetchNewsFromServer() {
   }
 }
 
-// Initialize page
+// ==================== INITIALIZE ====================
 function initializeNewsPage() {
   fetchNewsFromServer();
 }
 
-// Start application
 initializeNewsPage();
-
-document.addEventListener('newsAdded', function() {
-    fetchNewsFromServer();
-});
 </script>
 
 {% endblock content %}

@@ -13,7 +13,7 @@ from django.views.decorators.http import require_POST
 from django.utils.html import strip_tags
 from news.models import News
 from news.forms import NewsForm
-from django.views.decorators.csrf import csrf_exempt
+
 from authentication.decorators import login_required_custom
 
 
@@ -95,65 +95,17 @@ def add_news_entry_ajax(request):
         }, status=500)
 
 @csrf_exempt
-def delete_news_ajax(request, id):
-    if not request.user.is_authenticated:
-        return JsonResponse({"status": "error", "message": "User not authenticated"}, status=401)
-    
-    if request.method == "POST":
-        news = get_object_or_404(News, pk=id)
-        
-        if request.user.role != 'admin' and news.user != request.user:
-            return JsonResponse({"status": "error", "message": "Permission denied"}, status=403)
-
-        try:
-            news.delete()
-            return JsonResponse({"status": "success", "message": "News deleted successfully"})
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
-    else:
-        return JsonResponse({"status": "error", "message": "Invalid method"}, status=405)
-
-def show_xml(request):
-    news = News.objects.all()
-    xml_data = serializers.serialize("xml", news)
-    return HttpResponse(xml_data, content_type="application/xml")
-
-def show_xml_by_id(request, id):
-    try:
-        news = get_object_or_404(News, id=id)
-        xml_data = serializers.serialize("xml", [news])
-        return HttpResponse(xml_data, content_type="application/xml")
-    except News.DoesNotExist:
-        return HttpResponse(status=404)
-    
-def show_json(request):
-    news_list = News.objects.all()
-    data = [
-        {
-            'id': str(news.id),
-            'user_id': news.user.id if news.user else None,  # tambahkan ini
-            'title': news.title,
-            'content': news.content,
-            'category': news.category,
-            'thumbnail': news.thumbnail,
-            'created_at': news.published_at.isoformat() if news.published_at else None,  # ganti ke published_at
-        }
-        for news in news_list
-    ]
-    return JsonResponse(data, safe=False)
-
-@csrf_exempt
 def edit_news_entry_ajax(request, id):
     if not request.user.is_authenticated:
         return JsonResponse({"status": "error", "message": "User not authenticated"}, status=401)
-    
-    news = get_object_or_404(News, pk=id)
-    
-    if request.user.role != 'admin' and news.user != request.user:
-        return JsonResponse({"status": "error", "message": "Permission denied"}, status=403)
+
+    if request.user.role != 'admin':
+        return JsonResponse({"status": "error", "message": "Only admin can edit news"}, status=403)
 
     if request.method == "POST":
         try:
+            news = get_object_or_404(News, pk=id)
+            
             title = strip_tags(request.POST.get("title"))
             content = strip_tags(request.POST.get("content"))
             category = request.POST.get("category")
@@ -175,19 +127,66 @@ def edit_news_entry_ajax(request, id):
     else:
         return JsonResponse({"status": "error", "message": "Invalid method"}, status=405)
 
-# View untuk get news data (untuk form edit)
+@csrf_exempt
+@require_POST 
+def delete_news(request, id):
+    if not request.user.is_authenticated:
+        return JsonResponse({"status": "error", "message": "User not authenticated"}, status=401)
+
+    if request.user.role != 'admin':
+        return JsonResponse({"status": "error", "message": "Only admin can delete news"}, status=403)
+
+    try:
+        news = get_object_or_404(News, pk=id)
+        news.delete()
+        return JsonResponse({"status": "success", "message": "News deleted successfully"})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+def show_xml(request):
+    news = News.objects.all()
+    xml_data = serializers.serialize("xml", news)
+    return HttpResponse(xml_data, content_type="application/xml")
+
+def show_xml_by_id(request, id):
+    try:
+        news = get_object_or_404(News, id=id)
+        xml_data = serializers.serialize("xml", [news])
+        return HttpResponse(xml_data, content_type="application/xml")
+    except News.DoesNotExist:
+        return HttpResponse(status=404)
+    
+def show_json(request):
+    news_list = News.objects.all()
+    data = [
+        {
+            'id': str(news.id),
+            'user_id': str(news.user.id) if news.user else None,
+            'title': news.title,
+            'content': news.content,
+            'category': news.category,
+            'thumbnail': news.thumbnail,
+            'created_at': news.published_at.isoformat(), 
+        }
+        for news in news_list
+    ]
+    return JsonResponse(data, safe=False)
+
 def get_news_json(request, id):
-    news = get_object_or_404(News, pk=id)
-    news_data = {
-        'id': str(news.id),
-        'title': news.title,
-        'content': news.content,
-        'category': news.category,
-        'thumbnail': news.thumbnail,
-        'is_featured': news.is_featured,
-        'user_id': str(news.user.id)
-    }
-    return JsonResponse(news_data)
+    try:
+        news = get_object_or_404(News, pk=id)
+        news_data = {
+            'id': str(news.id),
+            'title': news.title,
+            'content': news.content,
+            'category': news.category,
+            'thumbnail': news.thumbnail or '',  
+            'user_id': str(news.user.id) if news.user else None
+        }
+        return JsonResponse(news_data)
+    except Exception as e:
+        print(f"Error in get_news_json: {str(e)}")
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
 def show_json_by_id(request, news_id):
     try:
@@ -198,7 +197,7 @@ def show_json_by_id(request, news_id):
             'content': news.content,
             'category': news.category,
             'thumbnail': news.thumbnail,
-            'created_at': news.created_at.isoformat() if news.created_at else None,
+            'created_at': news.published_at.isoformat() if news.published_at else None,
         }
         return JsonResponse(data)
     except News.DoesNotExist:
