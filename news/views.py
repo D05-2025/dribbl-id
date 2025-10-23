@@ -17,11 +17,48 @@ from news.forms import NewsForm
 from authentication.decorators import login_required_custom
 
 
+from django.db.models import Q
+
 @login_required_custom
 def show_news_page(request):
+    # Get filter parameters from URL
+    category_filter = request.GET.get('category', '')
+    sort_by = request.GET.get('sort', 'newest')
+    search_query = request.GET.get('search', '')
+    
+    # Start with all news
     news_list = News.objects.all()
+    
+    # Apply category filter
+    if category_filter:
+        news_list = news_list.filter(category=category_filter)
+    
+    # Apply search filter
+    if search_query:
+        news_list = news_list.filter(
+            Q(title__icontains=search_query) | 
+            Q(content__icontains=search_query)
+        )
+    
+    # Apply sorting
+    if sort_by == 'oldest':
+        news_list = news_list.order_by('published_at')
+    elif sort_by == 'title_asc':
+        news_list = news_list.order_by('title')
+    elif sort_by == 'title_desc':
+        news_list = news_list.order_by('-title')
+    else:  # newest (default)
+        news_list = news_list.order_by('-published_at')
+    
+    # Get category choices from model for filter dropdown
+    categories = News.CATEGORY_CHOICES
+    
     context = {
         'news_list': news_list,
+        'categories': categories,
+        'selected_category': category_filter,
+        'selected_sort': sort_by,
+        'search_query': search_query,
         'user': request.user
     }
     return render(request, 'news_page.html', context)

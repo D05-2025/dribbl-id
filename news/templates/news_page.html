@@ -15,68 +15,151 @@
       <p class="text-white">Stay updated with the latest basketball stories and analysis</p>
     </div>
 
-  {% if user.is_authenticated and user.role == 'admin' %}
-  <button onclick="showModal()" class="inline-flex items-center px-4 py-2 bg-white text-gray-700 font-semibold outline outline-2 outline-gray-600 outline-offset-[-2px] rounded-md hover:bg-gray-600 hover:text-white transition-colors mb-4">
-    Create News
-  </button>
-  {% endif %}
-
-    <!-- Loading State -->
-    <div id="loading" class="bg-white rounded-lg border border-gray-200 p-12 text-center hidden">
-      <svg class="animate-spin h-8 w-8 text-gray-600 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-      </svg>
-      <p class="text-gray-600 mt-3">Loading news...</p>
+    <!-- FILTER SECTION -->
+    <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+      <form method="GET" action="{% url 'news:show_news_page' %}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- Search Box -->
+        <div>
+          <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Cari Berita</label>
+          <input type="text" id="search" name="search" value="{{ search_query|default:'' }}" 
+                 class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500" 
+                 placeholder="Cari judul atau konten...">
+        </div>
+        
+        <!-- Category Filter -->
+        <div>
+          <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
+          <select id="category" name="category" 
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500">
+            <option value="">Semua Kategori</option>
+            <option value="NBA" {% if selected_category == 'NBA' %}selected{% endif %}>NBA</option>
+            <option value="IBL" {% if selected_category == 'IBL' %}selected{% endif %}>IBL</option>
+            <option value="FIBA" {% if selected_category == 'FIBA' %}selected{% endif %}>FIBA</option>
+            <option value="TRANSFER" {% if selected_category == 'TRANSFER' %}selected{% endif %}>Transfers & Trades</option>
+            <option value="HIGHLIGHT" {% if selected_category == 'HIGHLIGHT' %}selected{% endif %}>Game Highlights</option>
+            <option value="ANALYSIS" {% if selected_category == 'ANALYSIS' %}selected{% endif %}>Team & Player Analysis</option>
+          </select>
+        </div>
+        
+        <!-- Sort Filter -->
+        <div>
+          <label for="sort" class="block text-sm font-medium text-gray-700 mb-2">Urutkan</label>
+          <select id="sort" name="sort" 
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500">
+            <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Terbaru</option>
+            <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>Terlama</option>
+            <option value="title_asc" {% if selected_sort == 'title_asc' %}selected{% endif %}>Judul A-Z</option>
+            <option value="title_desc" {% if selected_sort == 'title_desc' %}selected{% endif %}>Judul Z-A</option>
+          </select>
+        </div>
+        
+        <!-- Buttons -->
+        <div class="flex items-end space-x-2">
+          <button type="submit" class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-md font-medium hover:bg-gray-700 transition-colors">
+            Filter
+          </button>
+          <a href="{% url 'news:show_news_page' %}" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition-colors">
+            Reset
+          </a>
+        </div>
+      </form>
+      
+      <!-- Results Info -->
+      {% if selected_category or search_query or selected_sort != 'newest' %}
+      <div class="mt-4 flex items-center justify-between">
+        <div class="text-sm text-gray-600">
+          {% if selected_category %}
+            <span class="font-medium">Kategori:</span> 
+            {% if selected_category == 'nba' %}NBA
+            {% elif selected_category == 'ibl' %}IBL
+            {% elif selected_category == 'fiba' %}FIBA
+            {% elif selected_category == 'transfer' %}Transfers & Trades
+            {% elif selected_category == 'highlight' %}Game Highlights
+            {% elif selected_category == 'analysis' %}Team & Player Analysis
+            {% else %}{{ selected_category }}{% endif %}
+          {% endif %}
+          {% if search_query %}
+            <span class="font-medium ml-3">Pencarian:</span> "{{ search_query }}"
+          {% endif %}
+          {% if selected_sort != 'newest' %}
+            <span class="font-medium ml-3">Urutan:</span> 
+            {% if selected_sort == 'oldest' %}Terlama
+            {% elif selected_sort == 'title_asc' %}Judul A-Z
+            {% elif selected_sort == 'title_desc' %}Judul Z-A
+            {% endif %}
+          {% endif %}
+        </div>
+        <div class="text-sm text-gray-600">
+          Ditemukan: <span class="font-bold">{{ news_list|length }}</span> berita
+        </div>
+      </div>
+      {% endif %}
     </div>
+    <!-- END FILTER SECTION -->
 
-    <!-- Error State -->
-    <div id="error" class="hidden"></div>
+    {% if user.is_authenticated and user.role == 'admin' %}
+    <button onclick="showModal()" class="inline-flex items-center px-4 py-2 bg-white text-gray-700 font-semibold outline outline-2 outline-gray-600 outline-offset-[-2px] rounded-md hover:bg-gray-600 hover:text-white transition-colors mb-6">
+      Create News
+    </button>
+    {% endif %}
 
     <!-- News Grid -->
-    <div id="grid" class="hidden"></div>
-
-    <!-- Empty State -->
-    <div id="empty" class="bg-white rounded-lg border border-gray-200 p-12 text-center hidden">
-      <div class="w-32 h-32 mx-auto mb-4">
-        <img src="{% static 'images/no-news.png' %}" alt="No news available" class="w-full h-full object-contain">
-      </div>
-      <h3 class="text-lg font-medium text-gray-900 mb-2">No news found</h3>
-    </div>
-
-        <!-- Pagination -->
-    <div id="pagination" class="hidden mt-8 flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
-      <div class="flex flex-1 justify-between sm:hidden">
-        <button id="prevBtnMobile" class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Previous</button>
-        <button id="nextBtnMobile" class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Next</button>
-      </div>
-      <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-        <div>
-          <p id="paginationInfo" class="text-sm text-gray-300">
-            Showing <span id="startItem" class="font-medium">0</span> to <span id="endItem" class="font-medium">0</span> of <span id="totalItems" class="font-medium">0</span> results
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for news in news_list %}
+      <article class="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300 overflow-hidden flex flex-col h-full">
+        <div class="aspect-[16/9] relative overflow-hidden">
+          {% if news.thumbnail %}
+          <img src="{{ news.thumbnail }}" alt="{{ news.title }}" class="w-full h-full object-cover">
+          {% else %}
+          <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+            <i class="fas fa-basketball-ball text-gray-400 text-3xl"></i>
+          </div>
+          {% endif %}
+          <div class="absolute top-3 left-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-gray-600 text-white">
+              {{ news.get_category_display }}
+            </span>
+          </div>
+        </div>
+        <div class="p-5 flex flex-col flex-1">
+          <div class="flex items-center text-sm text-gray-500 mb-3">
+            <time>{{ news.published_at|date:"d M Y" }}</time>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 leading-tight">
+            <a href="{% url 'news:show_news_detail' news.id %}" class="hover:text-gray-600 transition-colors">
+              {{ news.title }}
+            </a>
+          </h3>
+          <p class="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">
+            {{ news.content|truncatewords:30 }}
           </p>
-        </div>
-        <div>
-          <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-            <button id="prevBtn" class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
-              <span class="sr-only">Previous</span>
-              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
-              </svg>
-            </button>
-            <div id="pageNumbers" class="flex">
-              <!-- Page numbers will be inserted here by JavaScript -->
+          <div class="pt-4 border-t border-gray-100 flex items-center justify-between mt-auto">
+            <a href="{% url 'news:show_news_detail' news.id %}" class="text-gray-600 hover:text-gray-700 font-medium text-sm transition-colors">
+              Read more
+            </a>
+            {% if user.is_authenticated and user.role == 'admin' %}
+            <div class="flex space-x-2">
+              <button onclick="editNews('{{ news.id }}')" class="text-blue-600 hover:text-blue-700 text-sm transition-colors">Edit</button>
+              <button onclick="deleteNews('{{ news.id }}')" class="text-red-600 hover:text-red-700 text-sm transition-colors">Delete</button>
             </div>
-            <button id="nextBtn" class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
-              <span class="sr-only">Next</span>
-              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
-              </svg>
-            </button>
-          </nav>
+            {% endif %}
+          </div>
+        </div>
+      </article>
+      {% empty %}
+      <div class="col-span-full">
+        <div class="bg-white rounded-lg border border-gray-200 p-12 text-center">
+          <div class="w-32 h-32 mx-auto mb-4">
+            <img src="{% static 'images/no-news.png' %}" alt="No news available" class="w-full h-full object-contain">
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">No news found</h3>
+          <p class="text-gray-600">Try changing your filters or search terms.</p>
         </div>
       </div>
+      {% endfor %}
     </div>
+    <!-- END News Grid -->
+
   </div>
 </div>
 
@@ -183,34 +266,6 @@
 </div>
 
 <script>
-// Configuration
-// Configuration
-const NEWS_API_ENDPOINT = "{% url 'news:show_json' %}";
-const CURRENT_USER_ID = "{{ user.id|default_if_none:'' }}";
-const ITEMS_PER_PAGE = 50; // ← TAMBAHIN INI
-
-// DOM Elements
-const loadingSpinner = document.getElementById('loading');
-const errorMessage = document.getElementById('error');
-const emptyStateDisplay = document.getElementById('empty');
-const newsGridContainer = document.getElementById('grid');
-const paginationContainer = document.getElementById('pagination'); // ← TAMBAHIN INI
-const prevBtn = document.getElementById('prevBtn'); // ← TAMBAHIN INI
-const nextBtn = document.getElementById('nextBtn'); // ← TAMBAHIN INI
-const prevBtnMobile = document.getElementById('prevBtnMobile'); // ← TAMBAHIN INI
-const nextBtnMobile = document.getElementById('nextBtnMobile'); // ← TAMBAHIN INI
-const pageNumbersContainer = document.getElementById('pageNumbers'); // ← TAMBAHIN INI
-const paginationInfo = document.getElementById('paginationInfo'); // ← TAMBAHIN INI
-const startItem = document.getElementById('startItem'); // ← TAMBAHIN INI
-const endItem = document.getElementById('endItem'); // ← TAMBAHIN INI
-const totalItems = document.getElementById('totalItems'); // ← TAMBAHIN INI
-
-// State Variables
-let activeFilter = 'all';
-let allNewsData = [];
-let currentPage = 1; // ← TAMBAHIN INI
-let totalPages = 1; // ← TAMBAHIN INI
-
 // ==================== HELPER FUNCTION untuk CSRF Token ====================
 function getCSRFToken() {
   const token = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
@@ -294,7 +349,8 @@ async function submitEditForm(event) {
     if (response.ok && result.status === 'success') {
       showToast('News updated successfully!', '', 'success');
       hideEditModal();
-      fetchNewsFromServer();
+      // Redirect ke halaman news tanpa filter
+      window.location.href = "{% url 'news:show_news_page' %}";
     } else if (response.status === 403) {
       showToast('Permission denied', 'You cannot edit this news', 'error');
     } else if (response.status === 401) {
@@ -329,7 +385,8 @@ async function deleteNews(newsId) {
 
     if (response.ok && result.status === 'success') {
       showToast('News deleted successfully!', '', 'success');
-      fetchNewsFromServer();
+      // Redirect ke halaman news tanpa filter
+      window.location.href = "{% url 'news:show_news_page' %}";
     } else if (response.status === 403) {
       showToast('Permission denied', 'You cannot delete this news', 'error');
     } else if (response.status === 401) {
@@ -364,7 +421,12 @@ async function addNewsEntry() {
       document.getElementById("newsForm").reset();
       hideModal();
       showToast('News added successfully!', '', 'success');
-      fetchNewsFromServer();
+      // Redirect ke halaman news tanpa filter
+      window.location.href = "{% url 'news:show_news_page' %}";
+    } else if (response.status === 403) {
+      showToast('Permission denied', 'Only admin can create news', 'error');
+    } else if (response.status === 401) {
+      showToast('Authentication required', 'Please login to create news', 'error');
     } else {
       throw new Error(result.message || 'Failed to add news');
     }
@@ -374,12 +436,6 @@ async function addNewsEntry() {
   }
   return false;
 }
-
-// Event listener untuk form submission
-document.getElementById("newsForm").addEventListener("submit", function(e) {
-  e.preventDefault();
-  addNewsEntry();
-});
 
 // ==================== TOAST NOTIFICATION ====================
 function showToast(title, message, type = 'info') {
@@ -402,232 +458,11 @@ function showToast(title, message, type = 'info') {
   }, 5000);
 }
 
-// ==================== PAGE DISPLAY FUNCTIONS ====================
-function displayPageSection({ showLoading = false, showError = false, showEmpty = false, showGrid = false }) {
-  loadingSpinner.classList.toggle('hidden', !showLoading);
-  errorMessage.classList.toggle('hidden', !showError);
-  emptyStateDisplay.classList.toggle('hidden', !showEmpty);
-  newsGridContainer.classList.toggle('hidden', !showGrid);
-  
-  if (showGrid) {
-    newsGridContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
-  }
-}
-
-// ==================== CATEGORY HELPER ====================
-function getReadableCategoryName(categoryCode) {
-  const categoryMapping = {
-    'nba': 'NBA',
-    'ibl': 'IBL', 
-    'fiba': 'FIBA',
-    'transfer': 'Transfers & Trades',
-    'highlight': 'Game Highlights',
-    'analysis': 'Team & Player Analysis',
-  };
-  return categoryMapping[categoryCode] || categoryCode;
-}
-
-// ==================== BUILD NEWS CARD ====================
-function buildNewsCardElement(item) {
-    const article = document.createElement('article');
-    article.className = 'bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300 overflow-hidden flex flex-col h-full';
-
-    const linkDetail = `/news/detail/${item.id}/`;
-
-    const title = DOMPurify.sanitize(item.title);
-    const content = DOMPurify.sanitize(item.content);
-    const category = DOMPurify.sanitize(item.category);
-    const thumbnail = DOMPurify.sanitize(item.thumbnail);
-    const createdAt = DOMPurify.sanitize(new Date(item.created_at).toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric' 
-    }));
-
-    const thumbnailHtml = item.thumbnail 
-        ? `<img src='${thumbnail}' alt='${title}' class='w-full h-full object-cover'>` 
-        : `<div class='w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center'></div>`;
-    
-    const categoryLabel = DOMPurify.sanitize(getReadableCategoryName(category));
-
-    const canEditDelete = "{{ user.role }}" === 'admin';
-    
-    const editDeleteHtml = canEditDelete
-        ? `<div class='flex space-x-2'>
-            <button onclick="editNews('${item.id}')" class="text-blue-600 hover:text-blue-700 text-sm transition-colors">Edit</button>
-            <button onclick="deleteNews('${item.id}')" class="text-red-600 hover:text-red-700 text-sm transition-colors">Delete</button>
-          </div>`
-        : '';
-
-    const cardHtml = `
-        <div class="aspect-[16/9] relative overflow-hidden">
-          ${thumbnailHtml}
-          <div class="absolute top-3 left-3">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-gray-600 text-white">${categoryLabel}</span>
-          </div>
-        </div>
-        <div class="p-5 flex flex-col flex-1">
-          <div class="flex items-center text-sm text-gray-500 mb-3">
-            <time>${createdAt}</time>
-          </div>
-          <h3 class="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 leading-tight">
-            <a href="${linkDetail}" class="hover:text-gray-600 transition-colors">${title}</a>
-          </h3>
-          <p class="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">${content}</p>
-          <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
-            <a href="${linkDetail}" class="text-gray-600 hover:text-gray-700 font-medium text-sm transition-colors">Read more</a>
-            ${editDeleteHtml}
-          </div>
-        </div>
-    `;
-    
-    article.innerHTML = cardHtml;
-    return article;
-}
-
-// ==================== RENDER CARDS ====================
-function renderAllNewsCards(newsItems) {
-  newsGridContainer.innerHTML = '';
-  newsItems.forEach(newsItem => {
-    const cardElement = buildNewsCardElement(newsItem);
-    newsGridContainer.appendChild(cardElement);
-  });
-}
-
-// ==================== FILTER AND DISPLAY ====================
-// ==================== FILTER AND DISPLAY ====================
-function filterAndDisplayNews() {
-  const filteredNews = activeFilter === 'all' 
-    ? allNewsData 
-    : allNewsData.filter(news => Number(news.user_id) === Number(CURRENT_USER_ID));
-  
-    totalPages = Math.ceil(filteredNews.length / ITEMS_PER_PAGE);
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    const currentPageNews = filteredNews.slice(startIndex, endIndex);
-    
-    if (filteredNews.length === 0) {
-      displayPageSection({ showEmpty: true });
-      paginationContainer.classList.add('hidden');
-    } else {
-      renderAllNewsCards(currentPageNews);
-      displayPageSection({ showGrid: true });
-      
-  if (filteredNews.length > 0) {
-      paginationContainer.classList.remove('hidden');
-      updatePaginationInfo();
-      updatePaginationButtons();
-      renderPageNumbers();
-  } else {
-      paginationContainer.classList.add('hidden');
-  }
-  }
-}
-
-// ==================== FETCH NEWS ====================
-async function fetchNewsFromServer() {
-  try {
-    displayPageSection({ showLoading: true });
-    
-    const response = await fetch(NEWS_API_ENDPOINT, {
-      headers: { 'Accept': 'application/json' },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch news data from server');
-    }
-
-    const newsData = await response.json();
-    allNewsData = newsData || [];
-    
-    filterAndDisplayNews();
-  } catch (error) {
-    console.error('Error loading news:', error);
-    displayPageSection({ showError: true });
-  }
-}
-// ==================== PAGINATION FUNCTIONS ====================
-function updatePaginationInfo() {
-  const start = ((currentPage - 1) * ITEMS_PER_PAGE) + 1;
-  const end = Math.min(currentPage * ITEMS_PER_PAGE, allNewsData.length);
-  
-  startItem.textContent = start;
-  endItem.textContent = end;
-  totalItems.textContent = allNewsData.length;
-}
-
-function renderPageNumbers() {
-  pageNumbersContainer.innerHTML = '';
-  
-  // Show max 5 page numbers
-  let startPage = Math.max(1, currentPage - 2);
-  let endPage = Math.min(totalPages, startPage + 4);
-  
-  // Adjust if we're near the end
-  if (endPage - startPage < 4) {
-    startPage = Math.max(1, endPage - 4);
-  }
-  
-  for (let i = startPage; i <= endPage; i++) {
-    const pageButton = document.createElement('button');
-    pageButton.className = `relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-      i === currentPage 
-        ? 'z-10 bg-gray-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600' 
-        : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
-    }`;
-    pageButton.textContent = i;
-    pageButton.addEventListener('click', () => goToPage(i));
-    pageNumbersContainer.appendChild(pageButton);
-  }
-}
-
-function goToPage(page) {
-  if (page < 1 || page > totalPages) return;
-  
-  currentPage = page;
-  filterAndDisplayNews();
-  updatePaginationButtons();
-  updatePaginationInfo();
-  renderPageNumbers();
-  
-  // Scroll to top of news grid
-  newsGridContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function updatePaginationButtons() {
-  const isFirstPage = currentPage === 1;
-  const isLastPage = currentPage === totalPages;
-  
-  // Desktop buttons
-  prevBtn.disabled = isFirstPage;
-  nextBtn.disabled = isLastPage;
-  prevBtn.classList.toggle('opacity-50', isFirstPage);
-  nextBtn.classList.toggle('opacity-50', isLastPage);
-  
-  // Mobile buttons
-  prevBtnMobile.disabled = isFirstPage;
-  nextBtnMobile.disabled = isLastPage;
-  prevBtnMobile.classList.toggle('opacity-50', isFirstPage);
-  nextBtnMobile.classList.toggle('opacity-50', isLastPage);
-}
-
 // ==================== EVENT LISTENERS ====================
-document.addEventListener('DOMContentLoaded', function() {
-  // Pagination event listeners
-  prevBtn.addEventListener('click', () => goToPage(currentPage - 1));
-  nextBtn.addEventListener('click', () => goToPage(currentPage + 1));
-  prevBtnMobile.addEventListener('click', () => goToPage(currentPage - 1));
-  nextBtnMobile.addEventListener('click', () => goToPage(currentPage + 1));
-  
-  // Initialize news page
-  initializeNewsPage();
+document.getElementById("newsForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+  addNewsEntry();
 });
-// ==================== INITIALIZE ====================
-function initializeNewsPage() {
-  fetchNewsFromServer();
-}
-
-initializeNewsPage();
 </script>
 
 {% endblock content %}
