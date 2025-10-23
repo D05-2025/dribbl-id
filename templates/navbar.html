@@ -4,14 +4,14 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
             <div class="flex-shrink-0">
-                <a href="{% url 'home:show_main' %}"
+                <a href="{% url 'main:show_main' %}"
                    class="text-2xl font-bold text-white hover:text-blue-300 transition duration-300">
                     DRIBBL.ID
                 </a>
             </div>
 
             <div class="hidden md:flex items-center space-x-8">
-                <a href="{% url 'home:show_main' %}"
+                <a href="{% url 'main:show_main' %}"
                    class="{% if request.resolver_match.url_name == 'show_main' %}text-blue-300{% else %}text-white hover:text-blue-300{% endif %} px-3 py-2 text-sm font-medium transition duration-300 relative group">
                     Home
                     <span class="absolute bottom-0 left-0 w-{% if request.resolver_match.url_name == 'show_main' %}full{% else %}0{% endif %} h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
@@ -32,7 +32,7 @@
                 {% if request.session.username %}
                     <div class="flex items-center space-x-3">
                         <span class="text-white text-sm font-medium">Hello, {{ request.session.username }}</span>
-                        <form method="POST" action="{% url 'logout' %}" class="inline">
+                        <form method="POST" action="{% url 'main:logout' %}" class="inline">
                             {% csrf_token %}
                             <button type="submit"
                                     class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300">
@@ -42,11 +42,11 @@
                     </div>
                 {% else %}
                     <div class="flex items-center space-x-3">
-                        <a href="{% url 'login' %}"
+                        <a href="{% url 'main:login' %}"
                            class="text-white hover:text-blue-300 px-3 py-2 text-sm font-medium transition duration-300">
                             Login
                         </a>
-                        <a href="{% url 'register' %}"
+                        <a href="{% url 'main:register' %}"
                            class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300">
                             Register
                         </a>
@@ -69,7 +69,7 @@
 
     <div id="mobileMenu" class="md:hidden hidden bg-white/95 backdrop-blur-md border-t border-gray-200">
         <div class="px-2 pt-2 pb-3 space-y-1">
-            <a href="{% url 'home:show_main' %}"
+            <a href="{% url 'main:show_main' %}"
                class="{% if request.resolver_match.url_name == 'show_main' %}text-blue-600 border-l-4 border-blue-600{% else %}text-gray-700 border-l-4 border-transparent{% endif %} hover:text-blue-600 block px-3 py-2 text-base font-medium hover:border-blue-600">
                 Home
             </a>
@@ -85,7 +85,7 @@
             {% if request.session.username %}
                 <div class="border-t border-gray-200 pt-4 pb-3">
                     <div class="px-3 text-sm text-gray-500">Hello, {{ request.session.username }}</div>
-                    <form method="POST" action="{% url 'logout' %}">
+                    <form method="POST" action="{% url 'main:logout' %}">
                         {% csrf_token %}
                         <button type="submit"
                                 class="w-full text-left text-red-600 hover:text-red-800 block px-3 py-2 text-base font-medium">
@@ -95,11 +95,11 @@
                 </div>
             {% else %}
                 <div class="border-t border-gray-200 pt-4 pb-3 space-y-2">
-                    <a href="{% url 'login' %}"
+                    <a href="{% url 'main:login' %}"
                        class="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
                         Login
                     </a>
-                    <a href="{% url 'register' %}"
+                    <a href="{% url 'main:register' %}"
                        class="bg-blue-600 hover:bg-blue-700 text-white block px-3 py-2 text-base font-medium rounded-md text-center">
                         Register
                     </a>

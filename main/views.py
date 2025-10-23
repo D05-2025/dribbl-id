@@ -6,6 +6,17 @@ import datetime
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
+def show_main(request):
+    """
+    View untuk menampilkan homepage dengan efek ketik
+    """
+    context = {
+        'title': 'DRIBBL.ID',
+        'welcome_text': 'Welcome to DRIBBL.ID',
+        'subtitle': 'The biggest Indonesian basketball community',
+    }
+    return render(request, 'main.html', context)
+
 def register(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -14,11 +25,11 @@ def register(request):
 
         if not username or not password:
             messages.error(request, 'Username dan password wajib diisi.')
-            return redirect('register')
+            return redirect('main:register')
 
         if CustomUser.objects.filter(username=username).exists():
             messages.error(request, 'Username sudah digunakan.')
-            return redirect('register')
+            return redirect('main:register')
 
         user = CustomUser.objects.create(
             username=username,
@@ -28,7 +39,7 @@ def register(request):
         user.save()
 
         messages.success(request, 'Akun berhasil dibuat! Silakan login.')
-        return redirect('login') 
+        return redirect('main:login') 
 
     return render(request, 'register.html')
 
@@ -46,7 +57,7 @@ def login_user(request):
                 
                 user.save()
                 
-                response = HttpResponseRedirect(reverse("home:show_main"))
+                response = HttpResponseRedirect(reverse("main:show_main"))
                 response.set_cookie('last_login', str(datetime.datetime.now()))
                 return response
             else:
@@ -59,6 +70,6 @@ def login_user(request):
 def logout_user(request):
     request.session.flush()
     # PERBAIKAN: Redirect ke home page setelah logout
-    response = HttpResponseRedirect(reverse('home:show_main'))
+    response = HttpResponseRedirect(reverse('main:show_main'))
     response.delete_cookie('last_login')
     return response

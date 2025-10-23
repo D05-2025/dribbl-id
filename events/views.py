@@ -7,7 +7,7 @@ def event_list(request):
     user_role = request.session.get('role')
 
     if not user_id:
-        return redirect('login')
+        return redirect('/login')
 
     if user_role == 'admin':
         events = Event.objects.all()

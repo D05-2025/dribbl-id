@@ -14,8 +14,7 @@ from django.utils.html import strip_tags
 from news.models import News
 from news.forms import NewsForm
 
-from authentication.decorators import login_required_custom
-
+from main.decorators import login_required_custom
 
 from django.db.models import Q
 

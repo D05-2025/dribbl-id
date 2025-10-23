@@ -11,7 +11,7 @@ class News(models.Model):
         ('analysis', 'Team & Player Analysis'),
     ]
     
-    user = models.ForeignKey('authentication.CustomUser', on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey('main.CustomUser', on_delete=models.CASCADE, null=True, blank=True)
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)

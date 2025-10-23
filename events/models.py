@@ -1,5 +1,5 @@
 from django.db import models
-from authentication.models import CustomUser
+from main.models import CustomUser
 
 class Event(models.Model):
     title = models.CharField(max_length=200)

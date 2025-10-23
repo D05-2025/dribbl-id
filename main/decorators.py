@@ -1,7 +1,7 @@
 from django.shortcuts import redirect
 from functools import wraps
 
-def login_required_custom(function=None, login_url='/auth/login/'):
+def login_required_custom(function=None, login_url='/login/'):
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
