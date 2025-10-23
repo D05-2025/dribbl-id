@@ -42,8 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'authentication',
-    'news',
     'home',
+    'events',
+    'news',
 ]
 
 LOGIN_REDIRECT_URL = '/'  

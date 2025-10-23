@@ -11,4 +11,3 @@ def show_main(request):
         'subtitle': 'The biggest Indonesian basketball community',
     }
     return render(request, 'main.html', context)
-

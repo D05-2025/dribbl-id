@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block meta %}
+<title>{% if event %}Edit Event{% else %}Add Event{% endif %}</title>
+<style>
+  #notif {
+    display: none;
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: rgba(0, 255, 255, 0.1);
+    color: #00ffff;
+    border: 1px solid #00ffff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px #00ffff80;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-10px); }
+  }
+</style>
+{% endblock meta %}
+
+{% block content %}
+<div class="min-h-screen bg-black text-cyan-400 flex flex-col items-center py-10">
+  <div class="w-full max-w-2xl bg-[#0a0a0f]/80 p-8 rounded-2xl border border-cyan-400/30 shadow-[0_0_20px_#00ffff50]">
+    <h1 class="text-3xl font-bold mb-6 text-center">
+      {% if event %} Edit Event {% else %} Add Event {% endif %}
+    </h1>
+
+    <form id="eventForm" method="POST">
+      {% csrf_token %}
+      <div class="mb-4">
+        <label class="block mb-1 font-semibold">Title</label>
+        <input type="text" name="title" value="{{ event.title|default:'' }}"
+               class="w-full border border-cyan-400/40 bg-[#0d1117] text-cyan-100 rounded px-3 py-2 focus:ring-2 focus:ring-cyan-400" required>
+      </div>
+
+      <div class="mb-4">
+        <label class="block mb-1 font-semibold">Date</label>
+        <input type="date" name="date" value="{{ event.date|date:'Y-m-d' }}"
+               class="w-full border border-cyan-400/40 bg-[#0d1117] text-cyan-100 rounded px-3 py-2 focus:ring-2 focus:ring-cyan-400" required>
+      </div>
+
+      <div class="mb-4">
+        <label class="block mb-1 font-semibold">Description</label>
+        <textarea name="description" rows="4"
+                  class="w-full border border-cyan-400/40 bg-[#0d1117] text-cyan-100 rounded px-3 py-2 focus:ring-2 focus:ring-cyan-400" required>{{ event.description|default:'' }}</textarea>
+      </div>
+
+      <div class="flex justify-end">
+        <button type="submit"
+                class="bg-cyan-400 text-black font-semibold px-5 py-2 rounded hover:bg-cyan-300 transition-transform hover:scale-105">
+          Save
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Notifikasi -->
+  <div id="notif"></div>
+</div>
+
+<script>
+document.getElementById('eventForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const form = e.target;
+  const formData = new FormData(form);
+
+  const response = await fetch("", {
+    method: "POST",
+    headers: {
+      "X-Requested-With": "XMLHttpRequest",
+    },
+    body: formData
+  });
+
+  const notif = document.getElementById("notif");
+
+  if (response.ok) {
+    notif.innerText = "✅ Event saved successfully!";
+    notif.style.display = "block";
+    notif.style.animation = "fadeIn 0.3s ease";
+
+    setTimeout(() => {
+      notif.style.animation = "fadeOut 0.3s ease";
+      setTimeout(() => {
+        notif.style.display = "none";
+        window.location.href = "{% url 'events:event_list' %}";
+      }, 300);
+    }, 2000);
+  } else {
+    notif.innerText = "❌ Failed to save event!";
+    notif.style.display = "block";
+  }
+});
+</script>
+{% endblock %}
