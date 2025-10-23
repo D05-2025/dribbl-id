@@ -1,6 +1,7 @@
 <!-- templates/navbar.html -->
 <nav id="navbar"
-     class="fixed top-0 left-0 right-0 bg-transparent backdrop-blur-md z-50 transition-all duration-500 border-b border-transparent">
+    class="fixed top-0 left-0 right-0 bg-black backdrop-blur-md z-50 transition-all duration-500 border-b border-transparent"
+    style="background-color: #000 !important;">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
             <!-- Logo -->
@@ -19,9 +20,14 @@
                     <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
                 </a>
                 <a href="{% url 'events:event_list' %}"
-                   class="text-white hover:text-blue-300 px-3 py-2 text-sm font-medium transition duration-300 relative group">
+                   class="{% if request.resolver_match.url_name == 'show_main' %}text-blue-300{% else %}text-white hover:text-blue-300{% endif %} px-3 py-2 text-sm font-medium transition duration-300 relative group">
                     Events
-                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
+                    <span class="absolute bottom-0 left-0 w-{% if request.resolver_match.url_name == 'show_main' %}full{% else %}0{% endif %} h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="{% url 'news:show_news_page' %}"
+                   class="{% if request.resolver_match.url_name == 'show_news_page' %}text-blue-300{% else %}text-white hover:text-blue-300{% endif %} px-3 py-2 text-sm font-medium transition duration-300 relative group">
+                    News
+                    <span class="absolute bottom-0 left-0 w-{% if request.resolver_match.url_name == 'show_news_page' %}full{% else %}0{% endif %} h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
                 </a>
             </div>
 
@@ -45,7 +51,7 @@
                             Login
                         </a>
                         <a href="{% url 'register' %}"
-                           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300">
+                           class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300">
                             Register
                         </a>
                     </div>
@@ -74,9 +80,14 @@
                 Home
             </a>
             <a href="{% url 'events:event_list' %}"
-               class="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium border-l-4 border-transparent hover:border-blue-600">
+               class="{% if request.resolver_match.url_name == 'show_main' %}text-blue-600 border-l-4 border-blue-600{% else %}text-gray-700 border-l-4 border-transparent{% endif %} hover:text-blue-600 block px-3 py-2 text-base font-medium hover:border-blue-600">
                 Events
             </a>
+            <a href="{% url 'news:show_news_page' %}"
+               class="{% if request.resolver_match.url_name == 'show_news_page' %}text-blue-600 border-l-4 border-blue-600{% else %}text-gray-700 border-l-4 border-transparent{% endif %} hover:text-blue-600 block px-3 py-2 text-base font-medium hover:border-blue-600">
+                News
+            </a>
+
             {% if request.session.username %}
                 <div class="border-t border-gray-200 pt-4 pb-3">
                     <div class="px-3 text-sm text-gray-500">Hello, {{ request.session.username }}</div>

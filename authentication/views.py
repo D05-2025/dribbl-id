@@ -44,8 +44,7 @@ def login_user(request):
                 request.session['username'] = user.username
                 request.session['role'] = user.role
                 
-                # Update last_login
-                user.save()  # AbstractBaseUser handle last_login automatically
+                user.save()
                 
                 response = HttpResponseRedirect(reverse("home:show_main"))
                 response.set_cookie('last_login', str(datetime.datetime.now()))
@@ -58,8 +57,8 @@ def login_user(request):
     return render(request, 'login.html')
 
 def logout_user(request):
-    # Hapus session
     request.session.flush()
-    response = HttpResponseRedirect(reverse('login'))
+    # PERBAIKAN: Redirect ke home page setelah logout
+    response = HttpResponseRedirect(reverse('home:show_main'))
     response.delete_cookie('last_login')
     return response
