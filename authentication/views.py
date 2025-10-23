@@ -46,8 +46,7 @@ def login_user(request):
                 
                 user.save()
                 
-                # PERBAIKAN: Redirect ke home page
-                response = HttpResponseRedirect(reverse("home:show_main"))  # ← Ini yang benar
+                response = HttpResponseRedirect(reverse("home:show_main"))
                 response.set_cookie('last_login', str(datetime.datetime.now()))
                 return response
             else:
