@@ -32,12 +32,12 @@
           <select id="category" name="category" 
                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500">
             <option value="">Semua Kategori</option>
-            <option value="nba" {% if selected_category == 'nba' %}selected{% endif %}>NBA</option>
-            <option value="ibl" {% if selected_category == 'ibl' %}selected{% endif %}>IBL</option>
-            <option value="fiba" {% if selected_category == 'fiba' %}selected{% endif %}>FIBA</option>
-            <option value="transfer" {% if selected_category == 'transfer' %}selected{% endif %}>Transfers & Trades</option>
-            <option value="highlight" {% if selected_category == 'highlight' %}selected{% endif %}>Game Highlights</option>
-            <option value="analysis" {% if selected_category == 'analysis' %}selected{% endif %}>Team & Player Analysis</option>
+            <option value="NBA" {% if selected_category == 'NBA' %}selected{% endif %}>NBA</option>
+            <option value="IBL" {% if selected_category == 'IBL' %}selected{% endif %}>IBL</option>
+            <option value="FIBA" {% if selected_category == 'FIBA' %}selected{% endif %}>FIBA</option>
+            <option value="TRANSFER" {% if selected_category == 'TRANSFER' %}selected{% endif %}>Transfers & Trades</option>
+            <option value="HIGHLIGHT" {% if selected_category == 'HIGHLIGHT' %}selected{% endif %}>Game Highlights</option>
+            <option value="ANALYSIS" {% if selected_category == 'ANALYSIS' %}selected{% endif %}>Team & Player Analysis</option>
           </select>
         </div>
         
@@ -46,20 +46,20 @@
           <label for="sort" class="block text-sm font-medium text-gray-700 mb-2">Urutkan</label>
           <select id="sort" name="sort" 
                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500">
-            <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>🆕 Terbaru</option>
-            <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>📜 Terlama</option>
-            <option value="title_asc" {% if selected_sort == 'title_asc' %}selected{% endif %}>🔤 Judul A-Z</option>
-            <option value="title_desc" {% if selected_sort == 'title_desc' %}selected{% endif %}>🔠 Judul Z-A</option>
+            <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Terbaru</option>
+            <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>Terlama</option>
+            <option value="title_asc" {% if selected_sort == 'title_asc' %}selected{% endif %}>Judul A-Z</option>
+            <option value="title_desc" {% if selected_sort == 'title_desc' %}selected{% endif %}>Judul Z-A</option>
           </select>
         </div>
         
         <!-- Buttons -->
         <div class="flex items-end space-x-2">
           <button type="submit" class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-md font-medium hover:bg-gray-700 transition-colors">
-            🔍 Filter
+            Filter
           </button>
           <a href="{% url 'news:show_news_page' %}" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition-colors">
-            🔄 Reset
+            Reset
           </a>
         </div>
       </form>
