@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'authentication',
     'home',
+    'events',
 ]
 
 LOGIN_REDIRECT_URL = '/'  

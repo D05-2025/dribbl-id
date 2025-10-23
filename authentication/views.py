@@ -47,7 +47,7 @@ def login_user(request):
                 # Update last_login
                 user.save()  # AbstractBaseUser handle last_login automatically
                 
-                response = HttpResponseRedirect(reverse("main:show_main"))
+                response = HttpResponseRedirect(reverse("home:show_main"))
                 response.set_cookie('last_login', str(datetime.datetime.now()))
                 return response
             else:

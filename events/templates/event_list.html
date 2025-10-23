@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<title>Event List - DRIBBL.ID</title>
+
+<style>
+  body {
+    background-color: #000;
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding-top: 120px;
+  }
+
+  .page-wrapper {
+    width: 100%;
+    max-width: 1000px;
+    text-align: center;
+    padding: 20px;
+  }
+
+  h2.title {
+    font-weight: 700;
+    text-align: center;
+    font-size: 2.5rem;
+    color: #ffffff;
+    text-shadow: 0 0 15px #00ffff, 0 0 25px #00ccff;
+    margin-bottom: 60px;
+  }
+
+  .event-card {
+    background-color: #0a0a0f;
+    border: 1px solid rgba(0,255,255,0.3);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0,255,255,0.25);
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .event-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 0 30px rgba(0,255,255,0.45);
+  }
+
+  .event-card img {
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 15px;
+  }
+
+  .event-date {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    border-radius: 8px;
+  }
+
+  .event-title {
+    font-size: 1.6rem;
+    color: #00ffff;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .event-meta {
+    color: #ccc;
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+  }
+
+  .event-description {
+    color: #aaa;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+  }
+
+  .btn-create {
+    display: inline-block;
+    background-color: #00ffff;
+    color: #000;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: 0.3s;
+    margin-bottom: 40px;
+  }
+
+  .btn-create:hover {
+    background-color: #00b3e6;
+  }
+
+  .btn-edit {
+    color: #0dcaf0;
+    text-decoration: none;
+    font-weight: 500;
+    margin-right: 15px;
+  }
+
+  .btn-edit:hover {
+    text-decoration: underline;
+  }
+
+  .btn-delete {
+    color: #dc3545;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .btn-delete:hover {
+    text-decoration: underline;
+  }
+
+  .empty-text {
+    color: #888;
+    margin-top: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .page-wrapper {
+      padding: 10px;
+    }
+  }
+
+  /* ===== Modal Konfirmasi ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .modal-overlay.show {
+    display: flex;
+    opacity: 1;
+  }
+
+  .modal-box {
+    background: #0a0a0f;
+    border: 1px solid #00ffff;
+    border-radius: 12px;
+    padding: 25px 30px;
+    text-align: center;
+    box-shadow: 0 0 25px rgba(0,255,255,0.5), 0 0 50px rgba(0,255,255,0.2);
+    transform: scale(0.8);
+    transition: transform 0.25s ease;
+  }
+
+  .modal-overlay.show .modal-box {
+    transform: scale(1);
+  }
+
+  .modal-box h3 {
+    color: #00ffff;
+    margin-bottom: 15px;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .btn-cancel, .btn-confirm {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .btn-cancel {
+    background-color: #444;
+    color: #fff;
+  }
+
+  .btn-confirm {
+    background-color: #dc3545;
+    color: #fff;
+    box-shadow: 0 0 8px rgba(220, 53, 69, 0.4);
+  }
+
+  .btn-cancel:hover {
+    background-color: #666;
+  }
+
+  .btn-confirm:hover {
+    background-color: #b02a37;
+    box-shadow: 0 0 15px rgba(220, 53, 69, 0.6);
+  }
+</style>
+{% endblock meta %}
+
+{% block content %}
+<div class="page-wrapper">
+  <h2 class="title">Upcoming Events 🎉</h2>
+
+  {% if request.session.role == 'admin' %}
+  <div class="text-center mb-10">
+    <a href="{% url 'events:create_event' %}" class="btn-create">+ Tambah Event</a>
+  </div>
+  {% endif %}
+
+  {% if events %}
+    <div class="flex flex-col gap-10">
+      {% for event in events %}
+      <div class="event-card">
+        {% if event.image_url %}
+          <img src="{{ event.image_url }}" alt="Event Image">
+        {% else %}
+          <img src="{% static 'img/default-event.jpg' %}" alt="Default Event Image">
+        {% endif %}
+
+        <div class="event-date">{{ event.date|date:"d M Y" }}</div>
+        <h3 class="event-title">{{ event.title }}</h3>
+        <div class="event-meta">📍 {{ event.location|default:"Lokasi belum ditentukan" }}</div>
+
+        {% if event.time %}
+        <div class="event-meta">🕒 {{ event.time }}</div>
+        {% endif %}
+
+        <p class="event-description">{{ event.description|truncatewords:25 }}</p>
+
+        {% if request.session.role == 'admin' %}
+        <div>
+          <a href="{% url 'events:edit_event' event.id %}" class="btn-edit">Edit</a>
+          <a href="#" class="btn-delete" onclick="openModal('{{ event.id }}')">Delete</a>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Modal Konfirmasi Hapus -->
+    <div id="deleteModal" class="modal-overlay">
+      <div class="modal-box">
+        <h3>Konfirmasi Hapus</h3>
+        <p>Yakin mau hapus event ini?</p>
+        <div class="modal-actions">
+          <button onclick="closeModal()" class="btn-cancel">Batal</button>
+          <a id="confirmDeleteBtn" href="#" class="btn-confirm">Hapus</a>
+        </div>
+      </div>
+    </div>
+
+  {% else %}
+    <p class="empty-text">Belum ada event.</p>
+  {% endif %}
+</div>
+
+<script>
+  function openModal(eventId) {
+    const modal = document.getElementById('deleteModal');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    confirmBtn.href = `/events/${eventId}/delete/`;
+    modal.classList.add('show');
+  }
+
+  function closeModal() {
+    const modal = document.getElementById('deleteModal');
+    modal.classList.remove('show');
+    setTimeout(() => {
+      modal.style.display = 'none';
+      modal.style.opacity = '0';
+    }, 250);
+  }
+
+  // Tutup modal kalau klik di luar box
+  window.onclick = function(event) {
+    const modal = document.getElementById('deleteModal');
+    if (event.target === modal) {
+      closeModal();
+    }
+  }
+</script>
+{% endblock %}
