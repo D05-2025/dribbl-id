@@ -52,15 +52,19 @@ class MatchForm(forms.ModelForm):
 
     class Meta:
         model = Match
-        fields = ["home_team", "away_team", "tipoff_at", "venue", "image_url", "status"]
+        fields = ["home_team", "away_team", "tipoff_at", "venue", "image_url", "status", "home_score", "away_score"]
         widgets = {
             "tipoff_at": forms.DateTimeInput(attrs={"type": "datetime-local"}),
+            "home_score": forms.NumberInput(attrs={"min": 0, "step": 1}),
+            "away_score": forms.NumberInput(attrs={"min": 0, "step": 1}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["home_team"].widget.attrs.update({"placeholder": "Nama tim kandang", "class": _BASE_INPUT})
         self.fields["away_team"].widget.attrs.update({"placeholder": "Nama tim tandang", "class": _BASE_INPUT})
+        self.fields["home_score"].widget.attrs.update({"class": _BASE_INPUT})
+        self.fields["away_score"].widget.attrs.update({"class": _BASE_INPUT})
 
     def clean(self):
         cleaned = super().clean()
@@ -68,6 +72,15 @@ class MatchForm(forms.ModelForm):
         a = cleaned.get("away_team")
         if h and a and h == a:
             self.add_error("away_team", "Tim kandang dan tandang tidak boleh sama.")
+
+        # Validate negative scores
+        home_score = cleaned.get("home_score")
+        away_score = cleaned.get("away_score")
+        if home_score is not None and home_score < 0:
+            self.add_error("home_score", "Skor tidak boleh negatif.")
+        if away_score is not None and away_score < 0:
+            self.add_error("away_score", "Skor tidak boleh negatif.")
+
         return cleaned
 
 

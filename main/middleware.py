@@ -5,14 +5,14 @@ class CustomAuthMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        user_id = request.session.get('user_id')
-        if user_id:
-            try:
-                request.user = CustomUser.objects.get(id=user_id)
-            except CustomUser.DoesNotExist:
-                request.user = None
-        else:
-            request.user = None
-        
+        # Only override if Django's auth hasn't set a user
+        if not hasattr(request, 'user') or request.user.is_anonymous:
+            user_id = request.session.get('user_id')
+            if user_id:
+                try:
+                    request.user = CustomUser.objects.get(id=user_id)
+                except CustomUser.DoesNotExist:
+                    request.user = None
+
         response = self.get_response(request)
         return response

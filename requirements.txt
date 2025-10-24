@@ -5,3 +5,5 @@ psycopg2-binary
 requests
 urllib3
 python-dotenv
+coverage>=7.0
+openpyxl>=3.1

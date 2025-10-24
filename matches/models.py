@@ -137,6 +137,14 @@ class Match(models.Model):
     def is_scheduled(self) -> bool:
         return self.status == self.Status.SCHEDULED
 
+    def winner(self):
+        if self.home_score > self.away_score:
+            return "home"
+        elif self.away_score > self.home_score:
+            return "away"
+        else:
+            return "tie"
+
 
 # ---------------------------
 # Box Score (stat pemain per pertandingan)
