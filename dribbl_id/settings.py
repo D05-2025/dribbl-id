@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'main',
     'events',
     'news',
+    'players',
 ]
 
 LOGIN_REDIRECT_URL = '/'  

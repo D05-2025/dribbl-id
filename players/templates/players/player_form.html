@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-black text-white flex items-center justify-center px-4 py-12">
+  <div class="w-full max-w-3xl bg-[#111111] rounded-2xl shadow-2xl border border-gray-800 p-8">
+
+    <!-- Judul -->
+    <h1 class="text-3xl font-bold text-center mb-8 tracking-wide">{{ title }}</h1>
+
+    <!-- Form -->
+    <form method="post" class="space-y-6">
+      {% csrf_token %}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Name -->
+        <div>
+          <label for="id_name" class="block mb-2 text-sm font-semibold text-gray-300">Name</label>
+          {{ form.name }}
+        </div>
+
+        <!-- Team -->
+        <div>
+          <label for="id_team" class="block mb-2 text-sm font-semibold text-gray-300">Team</label>
+          {{ form.team }}
+        </div>
+
+        <!-- Position -->
+        <div>
+          <label for="id_position" class="block mb-2 text-sm font-semibold text-gray-300">Position</label>
+          {{ form.position }}
+        </div>
+
+        <!-- Points -->
+        <div>
+          <label for="id_points_per_game" class="block mb-2 text-sm font-semibold text-gray-300">Points per Game</label>
+          {{ form.points_per_game }}
+        </div>
+
+        <!-- Assists -->
+        <div>
+          <label for="id_assists_per_game" class="block mb-2 text-sm font-semibold text-gray-300">Assists per Game</label>
+          {{ form.assists_per_game }}
+        </div>
+
+        <!-- Rebounds -->
+        <div>
+          <label for="id_rebounds_per_game" class="block mb-2 text-sm font-semibold text-gray-300">Rebounds per Game</label>
+          {{ form.rebounds_per_game }}
+        </div>
+      </div>
+
+      <!-- Tombol Aksi -->
+      <div class="flex justify-between items-center pt-8 border-t border-gray-800">
+        <a href="{% url 'players:player_list' %}"
+           class="px-6 py-2.5 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm font-medium transition-all duration-200">
+          ← Back
+        </a>
+
+        <button type="submit"
+                class="px-6 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-sm font-semibold tracking-wide transition-all duration-200">
+          Save Player
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  /* Styling agar input form sejajar dan clean */
+  input, select, textarea {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.5rem;
+    background-color: #1c1c1c;
+    border: 1px solid #333;
+    color: #fff;
+    transition: all 0.3s ease;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: #ff4d4d;
+    box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.3);
+    outline: none;
+  }
+
+  label {
+    display: block;
+  }
+</style>
+{% endblock %}

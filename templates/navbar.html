@@ -26,6 +26,11 @@
                     News
                     <span class="absolute bottom-0 left-0 w-{% if request.resolver_match.url_name == 'show_news_page' %}full{% else %}0{% endif %} h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
                 </a>
+                <a href="{% url 'players:player_list' %}"
+                   class="{% if request.resolver_match.url_name == 'player_list' %}text-blue-300{% else %}text-white hover:text-blue-300{% endif %} px-3 py-2 text-sm font-medium transition duration-300 relative group">
+                    Players
+                    <span class="absolute bottom-0 left-0 w-{% if request.resolver_match.url_name == 'player_list' %}full{% else %}0{% endif %} h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
+                </a>
             </div>
 
             <div class="flex items-center space-x-4">
@@ -80,6 +85,10 @@
             <a href="{% url 'news:show_news_page' %}"
                class="{% if request.resolver_match.url_name == 'show_news_page' %}text-blue-600 border-l-4 border-blue-600{% else %}text-gray-700 border-l-4 border-transparent{% endif %} hover:text-blue-600 block px-3 py-2 text-base font-medium hover:border-blue-600">
                 News
+            </a>
+            <a href="{% url 'players:player_list' %}"
+               class="{% if request.resolver_match.url_name == 'player_list' %}text-blue-600 border-l-4 border-blue-600{% else %}text-gray-700 border-l-4 border-transparent{% endif %} hover:text-blue-600 block px-3 py-2 text-base font-medium hover:border-blue-600">
+                Players
             </a>
 
             {% if request.session.username %}

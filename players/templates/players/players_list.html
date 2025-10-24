@@ -1,0 +1,76 @@
+
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<title>Players | DRIBBL.ID</title>
+{% endblock meta %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-6 py-10 text-white">
+
+  <!-- Judul -->
+  <h1 class="text-3xl font-bold mb-8 text-center">🏀 Player Statistics</h1>
+
+  <!-- Tombol Aksi -->
+  <div class="flex justify-between mb-6">
+    <div>
+      <a href="{% url 'main:show_main' %}"
+         class="bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded transition duration-200">
+         ⬅ Back
+      </a>
+    </div>
+
+    {% if user.is_authenticated and user.role == 'admin' %}
+      <a href="{% url 'players:add_player' %}"
+         class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded transition duration-200">
+         ➕ Add Player
+      </a>
+    {% endif %}
+  </div>
+
+  <!-- Tabel Data -->
+  <div class="overflow-x-auto bg-gray-900 rounded-lg shadow-lg">
+    <table class="min-w-full border border-gray-800">
+      <thead class="bg-gray-800 text-gray-200 uppercase text-sm">
+        <tr>
+          <th class="py-3 px-4 border-b border-gray-700">Name</th>
+          <th class="py-3 px-4 border-b border-gray-700">Team</th>
+          <th class="py-3 px-4 border-b border-gray-700">Position</th>
+          <th class="py-3 px-4 border-b border-gray-700">PTS</th>
+          <th class="py-3 px-4 border-b border-gray-700">AST</th>
+          <th class="py-3 px-4 border-b border-gray-700">REB</th>
+          {% if user.is_authenticated and user.role == 'admin' %}
+            <th class="py-3 px-4 border-b border-gray-700">Actions</th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for player in players %}
+        <tr class="hover:bg-gray-800 transition">
+          <td class="py-3 px-4 border-b border-gray-700">{{ player.name }}</td>
+          <td class="py-3 px-4 border-b border-gray-700">{{ player.team }}</td>
+          <td class="py-3 px-4 border-b border-gray-700">{{ player.position }}</td>
+          <td class="py-3 px-4 border-b border-gray-700">{{ player.points_per_game }}</td>
+          <td class="py-3 px-4 border-b border-gray-700">{{ player.assists_per_game }}</td>
+          <td class="py-3 px-4 border-b border-gray-700">{{ player.rebounds_per_game }}</td>
+          {% if user.is_authenticated and user.role == 'admin' %}
+          <td class="py-3 px-4 border-b border-gray-700">
+            <a href="{% url 'players:edit_player' player.id %}" class="text-green-400 hover:underline">Edit</a> |
+            <a href="{% url 'players:delete_player' player.id %}" class="text-red-400 hover:underline">Delete</a>
+          </td>
+          {% endif %}
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="text-center py-6 text-gray-400">
+            No players found. Add one to get started!
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock content %}
