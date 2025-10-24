@@ -35,7 +35,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):   # ⬅️ tambahkan Permi
     # flags
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)   # ⬅️ tambahkan
+    is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
@@ -43,7 +43,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):   # ⬅️ tambahkan Permi
     objects = CustomUserManager()
 
     def has_perm(self, perm, obj=None):
-        return self.is_superuser or self.role == 'admin'   # sedikit lebih aman
+        return self.is_superuser or self.role == 'admin'
 
     def has_module_perms(self, app_label):
         return self.is_superuser or self.role == 'admin'
