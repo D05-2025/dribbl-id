@@ -100,7 +100,7 @@ def match_edit(request, pk):
             form = MatchForm(instance=m)
             html_form = render_to_string(
                 "matches/_match_form.html",
-                {"form": form},
+                {"form": form, "is_edit": True, "match_pk": pk},
                 request=request,
             )
             return JsonResponse({"ok": True, "html_form": html_form})
@@ -115,7 +115,6 @@ def match_edit(request, pk):
             return JsonResponse({
                 "ok": True,
                 "message": "Match berhasil diperbarui!",
-                "redirect": reverse("matches:detail", args=[obj.pk]),
             })
         messages.success(request, "Match berhasil diperbarui!")
         return redirect("matches:detail", pk=obj.pk)
@@ -124,7 +123,7 @@ def match_edit(request, pk):
     if _is_ajax(request):
         html_form = render_to_string(
             "matches/_match_form.html",
-            {"form": form},
+            {"form": form, "is_edit": True, "match_pk": pk},
             request=request,
         )
         return JsonResponse({"ok": False, "html_form": html_form}, status=400)

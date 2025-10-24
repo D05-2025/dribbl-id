@@ -7,96 +7,6 @@
 
 {% block content %}
 
-<script>
-  window.matchId = "{{ match.pk }}";
-
-  // Edit match modal functionality
-  (function(){
-    const btnEdit = document.getElementById('btnEditMatch');
-    let modal = document.getElementById('editMatchModal');
-
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'editMatchModal';
-      modal.className = 'fixed inset-0 z-50 hidden';
-      modal.innerHTML = `
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" data-close-modal></div>
-        <div class="relative mx-auto mt-20 w-[92%] max-w-xl rounded-2xl border border-neutral-800 bg-neutral-950 p-5">
-          <h2 class="text-lg font-semibold text-white mb-3">Edit Match</h2>
-          <div id="editModalBody">
-            <div class="text-neutral-400">Memuat formulir…</div>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-    }
-
-    const modalBody = modal.querySelector('#editModalBody');
-
-    function csrfToken(){
-      const m = document.cookie.match(/csrftoken=([^;]+)/);
-      return m ? m[1] : '';
-    }
-
-    function openModal(){
-      modal.classList.remove('hidden');
-    }
-    function closeModal(){
-      modal.classList.add('hidden');
-    }
-    modal.addEventListener('click', (e)=>{
-      if (e.target.closest('[data-close-modal]')) closeModal();
-    });
-
-    // Load edit form via AJAX
-    if (btnEdit){
-      btnEdit.addEventListener('click', async ()=>{
-        openModal();
-        try{
-          const res = await fetch("{% url 'matches:edit' match.pk %}", {
-            headers: {"X-Requested-With":"XMLHttpRequest"}
-          });
-          const data = await res.json();
-          modalBody.innerHTML = data.html_form || '<p class="text-red-400">Gagal memuat form.</p>';
-        }catch(err){
-          modalBody.innerHTML = '<p class="text-red-400">Gagal memuat form.</p>';
-        }
-      });
-    }
-
-    // Handle submit via event delegation
-    document.addEventListener('submit', async (e)=>{
-      if (e.target && e.target.id === 'matchForm'){
-        e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
-        try{
-          const res = await fetch(form.action, {
-            method: 'POST',
-            headers: {
-              'X-Requested-With': 'XMLHttpRequest',
-              'X-CSRFToken': csrfToken()
-            },
-            body: formData
-          });
-          const data = await res.json();
-          if (res.ok && data.ok){
-            closeModal();
-            // Reload page to show updated data
-            window.location.reload();
-          } else {
-            // render ulang form dengan error
-            if (data.html_form) modalBody.innerHTML = data.html_form;
-            else modalBody.innerHTML = '<p class="text-red-400">Validasi gagal.</p>';
-          }
-        }catch(err){
-          modalBody.innerHTML = '<p class="text-red-400">Terjadi kesalahan.</p>';
-        }
-      }
-    });
-  })();
-</script>
-
 {# ==== HERO FULL-BLEED (gambar span kiri–kanan) ==== #}
 {% if match.image_url %}
 <section class="relative w-full min-h-[320px] md:min-h-[460px] overflow-hidden">
@@ -107,10 +17,8 @@
     loading="lazy"
     decoding="async"
   />
-  {# gradient halus biar teks/caption kebaca #}
   <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/20 to-black/40 pointer-events-none" aria-hidden="true"></div>
 
-  {# caption pojok kiri bawah (opsional) #}
   <div class="absolute left-4 right-4 bottom-4 md:left-8 md:right-8 md:bottom-8">
     <div class="inline-flex items-center gap-2 text-white/90">
       <span class="text-sm md:text-base font-semibold">
@@ -149,17 +57,15 @@
       <span class="text-red-400">{{ match.away_team }}</span>
     </div>
 
-    {# === OPSI AKSI (kalau kamu butuh lagi) === #}
+    {# === OPSI AKSI === #}
     <div class="mt-5 flex flex-wrap gap-2">
-      {% if request.user %}
+      {% if request.user.is_authenticated %}
         <a href="{% url 'matches:score' match.pk %}"
            class="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 transition">
           Update Skor
         </a>
         <button type="button"
                 id="btnEditMatch"
-                data-modal-target="editMatchModal"
-                data-modal-toggle="editMatchModal"
                 class="inline-flex items-center rounded-md border border-neutral-700 px-3 py-2 text-sm font-medium text-neutral-200 hover:bg-neutral-700 transition">
           Edit Match
         </button>
@@ -202,4 +108,100 @@
   </section>
 
 </div>
+
+{# ===== Modal container (dibuat di template agar pasti ada) ===== #}
+<div id="editMatchModal" class="fixed inset-0 z-50 hidden" aria-hidden="true">
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" data-close-modal></div>
+  <div class="relative mx-auto mt-20 w-[92%] max-w-xl rounded-2xl border border-neutral-800 bg-neutral-950 p-5">
+    <h2 class="text-lg font-semibold text-white mb-3">Edit Match</h2>
+    <div id="editModalBody">
+      <div class="text-neutral-400">Memuat formulir…</div>
+    </div>
+  </div>
+</div>
+
+{# ===== JS: diletakkan PALING AKHIR agar elemen sudah ada ===== #}
+<script>
+  (function(){
+    window.matchId = "{{ match.pk }}";
+
+    const btnEdit = document.getElementById('btnEditMatch');
+    const modal = document.getElementById('editMatchModal');
+    const modalBody = modal ? modal.querySelector('#editModalBody') : null;
+
+    function csrfToken(){
+      const m = document.cookie.match(/csrftoken=([^;]+)/);
+      return m ? m[1] : '';
+    }
+    function openModal(){ modal.classList.remove('hidden'); }
+    function closeModal(){ modal.classList.add('hidden'); }
+
+    if (modal){
+      modal.addEventListener('click', (e)=>{
+        if (e.target.closest('[data-close-modal]')) closeModal();
+      });
+    }
+
+    // Load edit form via AJAX (GET)
+    if (btnEdit && modalBody){
+      btnEdit.addEventListener('click', async ()=>{
+        openModal();
+        modalBody.innerHTML = '<div class="text-neutral-400">Memuat formulir…</div>';
+        try{
+          const res = await fetch("{% url 'matches:edit' match.pk %}", {
+            headers: {"X-Requested-With":"XMLHttpRequest"},
+            credentials: 'same-origin'
+          });
+          if (res.redirected){
+            // Kemungkinan diarahkan ke login
+            window.location.href = res.url;
+            return;
+          }
+          const data = await res.json();
+          modalBody.innerHTML = data.html_form || '<p class="text-red-400">Gagal memuat form.</p>';
+        }catch(err){
+          console.error(err);
+          modalBody.innerHTML = '<p class="text-red-400">Gagal memuat form.</p>';
+        }
+      });
+    }
+
+    // Handle submit via event delegation (POST)
+    document.addEventListener('submit', async (e)=>{
+      if (e.target && e.target.id === 'matchForm'){
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        try{
+          const res = await fetch(form.action, {
+            method: 'POST',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRFToken': csrfToken()
+            },
+            body: formData,
+            credentials: 'same-origin'
+          });
+
+          if (res.redirected){
+            window.location.href = res.url;
+            return;
+          }
+
+          const data = await res.json();
+          if (res.ok && data.ok){
+            closeModal();
+            window.location.reload();
+          } else {
+            if (data.html_form) modalBody.innerHTML = data.html_form;
+            else modalBody.innerHTML = '<p class="text-red-400">Validasi gagal.</p>';
+          }
+        }catch(err){
+          console.error(err);
+          modalBody.innerHTML = '<p class="text-red-400">Terjadi kesalahan.</p>';
+        }
+      }
+    });
+  })();
+</script>
 {% endblock content %}

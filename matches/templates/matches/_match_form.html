@@ -1,5 +1,5 @@
 {# matches/templates/matches/_match_form.html #}
-<form id="matchForm" method="post" action="{% url 'matches:create' %}" enctype="multipart/form-data">
+<form id="matchForm" method="post" action="{% if is_edit %}{% url 'matches:edit' match_pk %}{% else %}{% url 'matches:create' %}{% endif %}" enctype="multipart/form-data">
   {% csrf_token %}
   <div class="space-y-4">
     {% for field in form %}
@@ -37,7 +37,7 @@
       Batal
     </button>
     <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700">
-      Buat Match
+      {% if is_edit %}Simpan Perubahan{% else %}Buat Match{% endif %}
     </button>
   </div>
 </form>

@@ -1,5 +1,5 @@
 {# matches/templates/matches/_match_row.html #}
-<div class="bg-neutral-950 border border-neutral-800 rounded-xl p-6 hover:bg-neutral-900/50 transition">
+<div class="bg-neutral-950 border border-neutral-800 rounded-xl p-6 hover:bg-neutral-900/50 hover:scale-105 hover:shadow-xl transition-all duration-200">
   <div class="flex items-start">
     <div class="flex-1">
       <div class="flex items-center gap-4 mb-2">
@@ -30,10 +30,6 @@
         <a href="{% url 'matches:detail' m.pk %}"
            class="inline-flex items-center rounded-md bg-neutral-800 px-3 py-2 text-sm font-medium text-neutral-200 hover:bg-neutral-700 transition">
           Lihat Detail
-        </a>
-        <a href="{% url 'matches:edit' m.pk %}"
-           class="inline-flex items-center rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm font-medium text-neutral-200 hover:bg-neutral-800 transition">
-          Edit
         </a>
       </div>
     </div>
