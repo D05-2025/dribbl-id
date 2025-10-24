@@ -27,12 +27,18 @@
                     <span class="absolute bottom-0 left-0 w-{% if request.resolver_match.url_name == 'show_news_page' %}full{% else %}0{% endif %} h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
                 </a>
                 <a href="{% url 'matches:schedule' %}"
-                  class="navlink text-white hover:text-blue-300 px-3 py-2 text-sm font-medium transition duration-300 relative group">
+                  class="{% if request.resolver_match.url_name == 'schedule' %}text-blue-300{% else %}text-white hover:text-blue-300{% endif %} px-3 py-2 text-sm font-medium transition duration-300 relative group">
                     Matches
-                    <span class="absolute bottom-0 left-0 w-0.5 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
+                   <span class="absolute bottom-0 left-0 w-{% if request.resolver_match.url_name == 'schedule' %}full{% else %}0{% endif %} h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
+                </a>
                 <a href="{% url 'teams:show_teams' %}"
                    class="text-white hover:text-blue-300 px-3 py-2 text-sm font-medium transition duration-300 relative group">
                     Teams
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="{% url 'players:player_list' %}"
+                   class="text-white hover:text-blue-300 px-3 py-2 text-sm font-medium transition duration-300 relative group">
+                    Players
                     <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
                 </a>
             </div>
@@ -91,12 +97,16 @@
                 News
             </a>
             <a href="{% url 'matches:schedule' %}"
-              class="block px-3 py-2 text-base font-medium border-l-4 border-transparent text-gray-700 hover:text-blue-600 hover:border-blue-600">
+              class="{% if request.resolver_match.url_name == 'schedule' %}text-blue-600 border-l-4 border-blue-600{% else %}text-gray-700 border-l-4 border-transparent{% endif %} hover:text-blue-600 block px-3 py-2 text-base font-medium hover:border-blue-600">
                 Matches
             </a>
             <a href="{% url 'teams:show_teams' %}"
-               class="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium border-l-4 border-transparent hover:border-blue-600">
+               class="{% if request.resolver_match.url_name == 'show_teams' %}text-blue-600 border-l-4 border-blue-600{% else %}text-gray-700 border-l-4 border-transparent{% endif %} hover:text-blue-600 block px-3 py-2 text-base font-medium hover:border-blue-600">
                 Teams
+            </a>
+            <a href="{% url 'players:player_list' %}"
+               class="{% if request.resolver_match.url_name == 'player_list' %}text-blue-600 border-l-4 border-blue-600{% else %}text-gray-700 border-l-4 border-transparent{% endif %} hover:text-blue-600 block px-3 py-2 text-base font-medium hover:border-blue-600">
+                Players
             </a>
             {% if request.session.username %}
                 <div class="border-t border-gray-200 pt-4 pb-3">
