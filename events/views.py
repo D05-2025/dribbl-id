@@ -8,7 +8,7 @@ def event_list(request):
     user_role = request.session.get('role')
 
     if not user_id:
-        return redirect('authentication:login')
+        return redirect('login')
 
     if user_role == 'admin':
         events = Event.objects.all()
@@ -41,7 +41,7 @@ def create_event(request):
     if not user_id:
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'error': 'Unauthorized'}, status=403)
-        return redirect('authentication:login')
+        return redirect('login')
     
     if user_role != 'admin':
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
