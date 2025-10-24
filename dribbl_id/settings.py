@@ -97,10 +97,10 @@ if PRODUCTION:
             'NAME': os.getenv('DB_NAME'),
             'USER': os.getenv('DB_USER'),
             'PASSWORD': os.getenv('DB_PASSWORD'),
-            'HOST': os.getenv('DB_HOST', 'pgsql.cs.ui.ac.id'),
+            'HOST': os.getenv('DB_HOST', '152.118.29.139'),
             'PORT': os.getenv('DB_PORT', '5432'),
             'OPTIONS': {
-                'options': f"-c search_path={os.getenv('SCHEMA', 'public')}"
+                'options': f"-c search_path={os.getenv('SCHEMA', 'tugas_kelompok')}"
             }
         }
     }
