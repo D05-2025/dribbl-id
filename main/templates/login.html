@@ -29,7 +29,7 @@
 
       <form class="space-y-6" method="POST">
         {% csrf_token %}
-        
+
         {% if form.errors %}
         <div class="bg-red-50 border border-red-200 rounded-md p-4">
           <p class="text-red-700 text-sm">Please enter a correct username and password.</p>
@@ -37,7 +37,7 @@
         {% endif %}
 
         <div>
-          <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+          <label for="username" class="block text-sm font-medium text-neutral-200">Username</label>
           <div class="mt-1">
             <input id="username" name="username" type="text" required 
                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500"
@@ -46,7 +46,7 @@
         </div>
 
         <div>
-          <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+          <label for="password" class="block text-sm font-medium text-neutral-200">Password</label>
           <div class="mt-1">
             <input id="password" name="password" type="password" required 
                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500"
@@ -63,7 +63,7 @@
       </form>
 
       <div class="mt-6 text-center">
-        <p class="text-sm text-gray-600">
+        <p class="text-sm text-neutral-400">
           Don't have an account?
           <a href="{% url 'main:register' %}" class="font-medium text-orange-600 hover:text-orange-500">
             Register here

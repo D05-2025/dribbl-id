@@ -1,0 +1,49 @@
+{# matches/templates/matches/_match_form.html #}
+<form id="matchForm" method="post" action="{% url 'matches:create' %}" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="space-y-4">
+    {% for field in form %}
+    <div>
+      <label class="block text-sm font-medium text-neutral-200 mb-1">
+        {{ field.label }}
+      </label>
+      {% if field.name == 'home_team' or field.name == 'away_team' %}
+        <select name="{{ field.name }}" class="block w-full rounded-md bg-neutral-900 text-neutral-100 placeholder-neutral-400 border border-neutral-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 px-3 py-2">
+          {% for choice in field.field.queryset %}
+            <option value="{{ choice.pk }}" {% if field.value == choice.pk %}selected{% endif %}>
+              {{ choice.name }}
+            </option>
+          {% endfor %}
+        </select>
+      {% elif field.name == 'tipoff_at' %}
+        <input type="datetime-local" name="{{ field.name }}" value="{{ field.value|date:'Y-m-d\TH:i' }}" class="block w-full rounded-md bg-neutral-900 text-neutral-100 border border-neutral-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 px-3 py-2">
+      {% elif field.name == 'venue' %}
+        <input type="text" name="{{ field.name }}" value="{{ field.value }}" placeholder="Venue (opsional)" class="block w-full rounded-md bg-neutral-900 text-neutral-100 placeholder-neutral-400 border border-neutral-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 px-3 py-2">
+      {% elif field.name == 'image_url' %}
+        <input type="url" name="{{ field.name }}" value="{{ field.value }}" placeholder="https://example.com/image.jpg" class="block w-full rounded-md bg-neutral-900 text-neutral-100 placeholder-neutral-400 border border-neutral-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 px-3 py-2">
+      {% elif field.name == 'status' %}
+        <select name="{{ field.name }}" class="block w-full rounded-md bg-neutral-900 text-neutral-100 border border-neutral-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 px-3 py-2">
+          {% for choice_value, choice_label in field.field.choices %}
+            <option value="{{ choice_value }}" {% if field.value == choice_value %}selected{% endif %}>
+              {{ choice_label }}
+            </option>
+          {% endfor %}
+        </select>
+      {% else %}
+        {{ field }}
+      {% endif %}
+      {% if field.errors %}
+        <p class="text-red-400 text-sm mt-1">{{ field.errors.0 }}</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <div class="flex justify-end gap-3 mt-6">
+    <button type="button" data-close-modal class="px-4 py-2 text-sm text-neutral-400 hover:text-neutral-200">
+      Batal
+    </button>
+    <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700">
+      Buat Match
+    </button>
+  </div>
+</form>

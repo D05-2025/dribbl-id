@@ -1,3 +1,4 @@
+# authentication/urls.py
 from django.urls import path
 from main.views import register, login_user, logout_user, show_main
 

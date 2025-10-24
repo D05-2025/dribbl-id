@@ -12,19 +12,24 @@
 
             <div class="hidden md:flex items-center space-x-8">
                 <a href="{% url 'main:show_main' %}"
-                   class="{% if request.resolver_match.url_name == 'show_main' %}text-blue-300{% else %}text-white hover:text-blue-300{% endif %} px-3 py-2 text-sm font-medium transition duration-300 relative group">
+                  class="{% if request.resolver_match.url_name == 'show_main' %}text-blue-300{% else %}text-white hover:text-blue-300{% endif %} px-3 py-2 text-sm font-medium transition duration-300 relative group">
                     Home
                     <span class="absolute bottom-0 left-0 w-{% if request.resolver_match.url_name == 'show_main' %}full{% else %}0{% endif %} h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
                 </a>
                 <a href="{% url 'events:event_list' %}"
-                   class="{% if request.resolver_match.url_name == 'event_list' %}text-blue-300{% else %}text-white hover:text-blue-300{% endif %} px-3 py-2 text-sm font-medium transition duration-300 relative group">
+                  class="{% if request.resolver_match.url_name == 'event_list' %}text-blue-300{% else %}text-white hover:text-blue-300{% endif %} px-3 py-2 text-sm font-medium transition duration-300 relative group">
                     Events
                     <span class="absolute bottom-0 left-0 w-{% if request.resolver_match.url_name == 'event_list' %}full{% else %}0{% endif %} h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
                 </a>
                 <a href="{% url 'news:show_news_page' %}"
-                   class="{% if request.resolver_match.url_name == 'show_news_page' %}text-blue-300{% else %}text-white hover:text-blue-300{% endif %} px-3 py-2 text-sm font-medium transition duration-300 relative group">
+                  class="{% if request.resolver_match.url_name == 'show_news_page' %}text-blue-300{% else %}text-white hover:text-blue-300{% endif %} px-3 py-2 text-sm font-medium transition duration-300 relative group">
                     News
                     <span class="absolute bottom-0 left-0 w-{% if request.resolver_match.url_name == 'show_news_page' %}full{% else %}0{% endif %} h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="{% url 'matches:results' %}"
+                  class="navlink text-white hover:text-blue-300 px-3 py-2 text-sm font-medium transition duration-300 relative group">
+                    Matches
+                    <span class="absolute bottom-0 left-0 w-0.5 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
                 </a>
             </div>
 
@@ -70,16 +75,20 @@
     <div id="mobileMenu" class="md:hidden hidden bg-white/95 backdrop-blur-md border-t border-gray-200">
         <div class="px-2 pt-2 pb-3 space-y-1">
             <a href="{% url 'main:show_main' %}"
-               class="{% if request.resolver_match.url_name == 'show_main' %}text-blue-600 border-l-4 border-blue-600{% else %}text-gray-700 border-l-4 border-transparent{% endif %} hover:text-blue-600 block px-3 py-2 text-base font-medium hover:border-blue-600">
+              class="{% if request.resolver_match.url_name == 'show_main' %}text-blue-600 border-l-4 border-blue-600{% else %}text-gray-700 border-l-4 border-transparent{% endif %} hover:text-blue-600 block px-3 py-2 text-base font-medium hover:border-blue-600">
                 Home
             </a>
             <a href="{% url 'events:event_list' %}"
-               class="{% if request.resolver_match.url_name == 'event_list' %}text-blue-600 border-l-4 border-blue-600{% else %}text-gray-700 border-l-4 border-transparent{% endif %} hover:text-blue-600 block px-3 py-2 text-base font-medium hover:border-blue-600">
+              class="{% if request.resolver_match.url_name == 'event_list' %}text-blue-600 border-l-4 border-blue-600{% else %}text-gray-700 border-l-4 border-transparent{% endif %} hover:text-blue-600 block px-3 py-2 text-base font-medium hover:border-blue-600">
                 Events
             </a>
             <a href="{% url 'news:show_news_page' %}"
-               class="{% if request.resolver_match.url_name == 'show_news_page' %}text-blue-600 border-l-4 border-blue-600{% else %}text-gray-700 border-l-4 border-transparent{% endif %} hover:text-blue-600 block px-3 py-2 text-base font-medium hover:border-blue-600">
+              class="{% if request.resolver_match.url_name == 'show_news_page' %}text-blue-600 border-l-4 border-blue-600{% else %}text-gray-700 border-l-4 border-transparent{% endif %} hover:text-blue-600 block px-3 py-2 text-base font-medium hover:border-blue-600">
                 News
+            </a>
+            <a href="{% url 'matches:results' %}"
+              class="block px-3 py-2 text-base font-medium border-l-4 border-transparent text-gray-700 hover:text-blue-600 hover:border-blue-600">
+                Matches
             </a>
 
             {% if request.session.username %}
@@ -111,21 +120,38 @@
 
 <script>
 function toggleMobileMenu() {
-    const mobileMenu = document.getElementById('mobileMenu');
-    mobileMenu.classList.toggle('hidden');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const expanded = mobileMenu.classList.toggle('hidden');
+  // update aria-expanded
+  const btn = document.querySelector('button[aria-controls="mobileMenu"]');
+  if (btn) btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
 }
 
-// Efek perubahan navbar saat scroll
+// Scroll effect: hanya ubah warna untuk elemen dengan class 'navlink'
+// sehingga tombol (bg-blue/red) tidak ikut berubah
 window.addEventListener('scroll', () => {
-    const navbar = document.getElementById('navbar');
-    if (window.scrollY > 50) {
-        navbar.classList.add('bg-white', 'shadow-lg', 'border-gray-200');
-        navbar.classList.remove('bg-transparent', 'border-transparent');
-        navbar.querySelectorAll('a').forEach(a => a.classList.replace('text-white', 'text-gray-700'));
-    } else {
-        navbar.classList.add('bg-transparent', 'border-transparent');
-        navbar.classList.remove('bg-white', 'shadow-lg', 'border-gray-200');
-        navbar.querySelectorAll('a').forEach(a => a.classList.replace('text-gray-700', 'text-white'));
-    }
+  const navbar = document.getElementById('navbar');
+  const links = navbar.querySelectorAll('.navlink'); // aman: tidak mengenai tombol
+  const scrolled = window.scrollY > 50;
+
+  if (scrolled) {
+    navbar.classList.add('bg-white', 'shadow-lg', 'border-gray-200');
+    navbar.classList.remove('bg-transparent', 'border-transparent');
+    links.forEach(a => {
+      if (a.classList.contains('text-white')) {
+        a.classList.remove('text-white');
+        a.classList.add('text-gray-700');
+      }
+    });
+  } else {
+    navbar.classList.add('bg-transparent', 'border-transparent');
+    navbar.classList.remove('bg-white', 'shadow-lg', 'border-gray-200');
+    links.forEach(a => {
+      if (a.classList.contains('text-gray-700')) {
+        a.classList.remove('text-gray-700');
+        a.classList.add('text-white');
+      }
+    });
+  }
 });
 </script>
