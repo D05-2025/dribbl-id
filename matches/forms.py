@@ -25,6 +25,8 @@ class TeamForm(forms.ModelForm):
 
 
 class PlayerForm(forms.ModelForm):
+    team = forms.CharField(max_length=100, label="Team")
+
     class Meta:
         model = Player
         fields = ["team", "full_name", "jersey_number", "position", "is_active"]
@@ -34,8 +36,7 @@ class PlayerForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["team"].queryset = Team.objects.order_by("name")
-        self.fields["team"].widget.attrs.update({"class": _BASE_SELECT})
+        self.fields["team"].widget.attrs.update({"placeholder": "Nama tim", "class": _BASE_INPUT})
         self.fields["full_name"].widget.attrs.update({"placeholder": "Nama lengkap", "class": _BASE_INPUT})
         self.fields["jersey_number"].widget.attrs.update({"class": _BASE_INPUT})
         self.fields["position"].widget.attrs.update({"class": _BASE_SELECT})
@@ -46,12 +47,20 @@ class PlayerForm(forms.ModelForm):
 # Match
 # =========================
 class MatchForm(forms.ModelForm):
+    home_team = forms.CharField(max_length=100, label="Home Team")
+    away_team = forms.CharField(max_length=100, label="Away Team")
+
     class Meta:
         model = Match
         fields = ["home_team", "away_team", "tipoff_at", "venue", "image_url", "status"]
         widgets = {
             "tipoff_at": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["home_team"].widget.attrs.update({"placeholder": "Nama tim kandang", "class": _BASE_INPUT})
+        self.fields["away_team"].widget.attrs.update({"placeholder": "Nama tim tandang", "class": _BASE_INPUT})
 
     def clean(self):
         cleaned = super().clean()
@@ -96,21 +105,12 @@ class PlayerBoxScoreForm(forms.ModelForm):
         label="Player",
         widget=forms.Select(attrs={"class": _BASE_SELECT}),
     )
-    team = forms.ModelChoiceField(
-        queryset=Team.objects.order_by("name"),
-        empty_label="Pilih tim…",
-        label="Team",
-        widget=forms.Select(attrs={"class": _BASE_SELECT}),
-    )
+    team = forms.CharField(max_length=100, label="Team")
 
     def __init__(self, *args, **kwargs):
         self.match = kwargs.pop('match', None)
         super().__init__(*args, **kwargs)
         if self.match:
-            # Filter team choices to only home and away teams
-            self.fields['team'].queryset = Team.objects.filter(
-                id__in=[self.match.home_team_id, self.match.away_team_id]
-            ).order_by("name")
             # Filter player choices to players from home and away teams
             self.fields['player'].queryset = Player.objects.filter(
                 team__in=[self.match.home_team, self.match.away_team]
@@ -147,8 +147,8 @@ class PlayerBoxScoreForm(forms.ModelForm):
         self.fields["minutes"].widget = forms.TextInput(
             attrs={"class": _BASE_INPUT, "placeholder": "mm:ss (mis. 32:15) atau angka menit"}
         )
-        # dropdown Team tampilkan nama lengkap
-        self.fields["team"].label_from_instance = lambda obj: obj.name
+        # styling team input
+        self.fields["team"].widget.attrs.update({"class": _BASE_INPUT, "placeholder": "Nama tim"})
         # styling angka
         for k, f in self.fields.items():
             if isinstance(f.widget, forms.NumberInput):
@@ -163,20 +163,19 @@ class PlayerBoxScoreForm(forms.ModelForm):
             self.initial["minutes"] = f"{m:02d}:{s:02d}"
 
         if self.match:
-            # Filter team choices to only home and away teams
-            self.fields['team'].queryset = Team.objects.filter(
-                id__in=[self.match.home_team_id, self.match.away_team_id]
-            ).order_by("name")
+            # Set initial team value if editing
+            if self.instance and self.instance.pk:
+                self.initial['team'] = self.instance.team
 
     def clean(self):
         cleaned = super().clean()
 
         # --- validasi player di team terpilih ---
-        team_obj = cleaned.get("team")
+        team_name = cleaned.get("team")
         player_obj = cleaned.get("player")
 
-        if not team_obj:
-            self.add_error("team", "Pilih tim terlebih dahulu.")
+        if not team_name:
+            self.add_error("team", "Masukkan nama tim.")
             return cleaned
 
         if not player_obj:
@@ -184,7 +183,7 @@ class PlayerBoxScoreForm(forms.ModelForm):
             return cleaned
 
         # pastikan pemain di team yang dipilih
-        if player_obj.team != team_obj:
+        if player_obj.team != team_name:
             self.add_error("player", "Pemain tidak berada di tim yang dipilih.")
             return cleaned
 

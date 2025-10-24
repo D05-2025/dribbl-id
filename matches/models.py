@@ -28,7 +28,7 @@ class Player(models.Model):
         PF = "PF", "Power Forward"
         C  = "C",  "Center"
 
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="players")
+    team = models.CharField(max_length=100)
     full_name = models.CharField(max_length=120)
     jersey_number = models.PositiveIntegerField(null=True, blank=True)
     position = models.CharField(max_length=2, choices=Position.choices, default=Position.SG)
@@ -36,7 +36,7 @@ class Player(models.Model):
 
     class Meta:
         unique_together = ("team", "full_name")
-        ordering = ["team__name", "full_name"]
+        ordering = ["team", "full_name"]
 
     def __str__(self):
         return f"{self.full_name} ({self.team})"
@@ -65,10 +65,10 @@ class Match(models.Model):
         FINISHED  = "finished", "Finished"
         CANCELED  = "canceled", "Canceled"
 
-    uuid = models.UUIDField(editable=False, unique=True, db_index=True)
+    uuid = models.UUIDField(editable=False, unique=True, db_index=True, default=uuid.uuid4)
     season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True, blank=True, related_name="matches")
-    home_team = models.ForeignKey(Team, on_delete=models.PROTECT, related_name="home_games")
-    away_team = models.ForeignKey(Team, on_delete=models.PROTECT, related_name="away_games")
+    home_team = models.CharField(max_length=100)
+    away_team = models.CharField(max_length=100)
     tipoff_at = models.DateTimeField(db_index=True, help_text="Waktu mulai pertandingan (tip-off)")
     venue = models.CharField(max_length=120, blank=True, db_index=True)
     image_url = models.URLField(blank=True, help_text="URL gambar pertandingan dari Google")
@@ -144,7 +144,7 @@ class Match(models.Model):
 class PlayerBoxScore(models.Model):
     match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name="box_scores")
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="box_scores")
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="box_scores")
+    team = models.CharField(max_length=100)
 
     # Basic info
     is_starter = models.BooleanField(default=False)

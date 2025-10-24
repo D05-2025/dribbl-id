@@ -24,15 +24,13 @@ def match_schedule(request):
     q = (request.GET.get("q") or "").strip()
     qs = (
         Match.objects
-        .select_related("home_team", "away_team", "season")
+        .select_related("season")
         .order_by("tipoff_at")
     )
     if q:
         qs = qs.filter(
-            Q(home_team__name__icontains=q) |
-            Q(away_team__name__icontains=q) |
-            Q(home_team__short_name__icontains=q) |
-            Q(away_team__short_name__icontains=q) |
+            Q(home_team__icontains=q) |
+            Q(away_team__icontains=q) |
             Q(venue__icontains=q)
         )
 
@@ -43,16 +41,14 @@ def match_results(request):
     q = (request.GET.get("q") or "").strip()
     qs = (
         Match.objects
-        .select_related("home_team", "away_team", "season")
+        .select_related("season")
         .filter(status="finished")
         .order_by("-tipoff_at")
     )
     if q:
         qs = qs.filter(
-            Q(home_team__name__icontains=q) |
-            Q(away_team__name__icontains=q) |
-            Q(home_team__short_name__icontains=q) |
-            Q(away_team__short_name__icontains=q) |
+            Q(home_team__icontains=q) |
+            Q(away_team__icontains=q) |
             Q(venue__icontains=q)
         )
 
@@ -62,7 +58,7 @@ def match_results(request):
 def match_detail(request, pk):
     m = get_object_or_404(
         Match.objects
-        .select_related("home_team", "away_team", "season"),
+        .select_related("season"),
         pk=pk
     )
 
@@ -165,7 +161,7 @@ def boxscore_add(request, pk):
             box = form.save(commit=False)
             box.match = m
             # safety: team harus salah satu dari home/away
-            if box.team_id not in (m.home_team_id, m.away_team_id):
+            if box.team not in (m.home_team, m.away_team):
                 messages.error(request, "Team boxscore harus home atau away pada match ini.")
                 return redirect("matches:detail", pk=m.pk)
             box.save()
@@ -187,7 +183,7 @@ def boxscore_edit(request, pk, box_id):
         form = PlayerBoxScoreForm(request.POST, instance=box, match=m)
         if form.is_valid():
             b = form.save(commit=False)
-            if b.team_id not in (m.home_team_id, m.away_team_id):
+            if b.team not in (m.home_team, m.away_team):
                 messages.error(request, "Team boxscore harus home atau away pada match ini.")
                 return redirect("matches:detail", pk=m.pk)
             b.save()
@@ -220,15 +216,44 @@ def match_create(request):
             return JsonResponse({"ok": True, "html_form": html_form})
         return render(request, "matches/match_form.html", {"form": form})
 
+    # POST
+    form = MatchForm(request.POST)
+    if form.is_valid():
+        match = form.save()
+        if _is_ajax(request):
+            row_html = render_to_string(
+                "matches/_match_row.html",
+                {"m": match},
+                request=request,
+            )
+            return JsonResponse({
+                "ok": True,
+                "message": "Match berhasil dibuat.",
+                "row_html": row_html,
+                "redirect": reverse("matches:detail", args=[match.pk]),
+            })
+        return redirect("matches:detail", pk=match.pk)
+
+    # invalid
+    if _is_ajax(request):
+        html_form = render_to_string(
+            "matches/_match_form.html",
+            {"form": form},
+            request=request,
+        )
+        return JsonResponse({"ok": False, "html_form": html_form}, status=400)
+
+    return render(request, "matches/match_form.html", {"form": form})
+
 
 def matches_json(request):
-    matches = Match.objects.select_related("home_team", "away_team", "season").all()
+    matches = Match.objects.select_related("season").all()
     data = []
     for match in matches:
         data.append({
             "uuid": str(match.uuid),
-            "home_team": match.home_team.name,
-            "away_team": match.away_team.name,
+            "home_team": match.home_team,
+            "away_team": match.away_team,
             "tipoff_at": match.tipoff_at.isoformat(),
             "venue": match.venue,
             "status": match.status,
@@ -239,13 +264,13 @@ def matches_json(request):
 
 
 def matches_xml(request):
-    matches = Match.objects.select_related("home_team", "away_team", "season").all()
+    matches = Match.objects.select_related("season").all()
     root = Element("matches")
     for match in matches:
         match_elem = SubElement(root, "match")
         SubElement(match_elem, "uuid").text = str(match.uuid)
-        SubElement(match_elem, "home_team").text = match.home_team.name
-        SubElement(match_elem, "away_team").text = match.away_team.name
+        SubElement(match_elem, "home_team").text = match.home_team
+        SubElement(match_elem, "away_team").text = match.away_team
         SubElement(match_elem, "tipoff_at").text = match.tipoff_at.isoformat()
         SubElement(match_elem, "venue").text = match.venue or ""
         SubElement(match_elem, "status").text = match.status

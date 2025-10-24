@@ -20,14 +20,7 @@
           <label class="block text-sm font-medium text-neutral-200 mb-2">
             {{ form.home_team.label }}
           </label>
-          <select name="{{ form.home_team.name }}" class="block w-full rounded-md bg-neutral-900 text-neutral-100 border border-neutral-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 px-3 py-2">
-            <option value="">Pilih Home Team</option>
-            {% for choice in form.home_team.field.queryset %}
-              <option value="{{ choice.pk }}" {% if form.home_team.value == choice.pk %}selected{% endif %}>
-                {{ choice.name }}
-              </option>
-            {% endfor %}
-          </select>
+          <input type="text" name="{{ form.home_team.name }}" value="{{ form.home_team.value }}" placeholder="Nama tim kandang" class="block w-full rounded-md bg-neutral-900 text-neutral-100 placeholder-neutral-400 border border-neutral-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 px-3 py-2">
           {% if form.home_team.errors %}
             <p class="text-red-400 text-sm mt-1">{{ form.home_team.errors.0 }}</p>
           {% endif %}
@@ -37,14 +30,7 @@
           <label class="block text-sm font-medium text-neutral-200 mb-2">
             {{ form.away_team.label }}
           </label>
-          <select name="{{ form.away_team.name }}" class="block w-full rounded-md bg-neutral-900 text-neutral-100 border border-neutral-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 px-3 py-2">
-            <option value="">Pilih Away Team</option>
-            {% for choice in form.away_team.field.queryset %}
-              <option value="{{ choice.pk }}" {% if form.away_team.value == choice.pk %}selected{% endif %}>
-                {{ choice.name }}
-              </option>
-            {% endfor %}
-          </select>
+          <input type="text" name="{{ form.away_team.name }}" value="{{ form.away_team.value }}" placeholder="Nama tim tandang" class="block w-full rounded-md bg-neutral-900 text-neutral-100 placeholder-neutral-400 border border-neutral-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 px-3 py-2">
           {% if form.away_team.errors %}
             <p class="text-red-400 text-sm mt-1">{{ form.away_team.errors.0 }}</p>
           {% endif %}
@@ -98,7 +84,7 @@
       </div>
 
       <div class="flex justify-end gap-3 pt-4">
-        <a href="{% url 'matches:detail' form.instance.pk %}" class="inline-flex items-center rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-200 hover:bg-neutral-700 transition">
+        <a href="{% url 'matches:schedule' %}" class="inline-flex items-center rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-200 hover:bg-neutral-700 transition">
           Batal
         </a>
         <button type="submit" class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition">

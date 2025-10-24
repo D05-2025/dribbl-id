@@ -8,13 +8,7 @@
         {{ field.label }}
       </label>
       {% if field.name == 'home_team' or field.name == 'away_team' %}
-        <select name="{{ field.name }}" class="block w-full rounded-md bg-neutral-900 text-neutral-100 placeholder-neutral-400 border border-neutral-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 px-3 py-2">
-          {% for choice in field.field.queryset %}
-            <option value="{{ choice.pk }}" {% if field.value == choice.pk %}selected{% endif %}>
-              {{ choice.name }}
-            </option>
-          {% endfor %}
-        </select>
+        <input type="text" name="{{ field.name }}" value="{{ field.value }}" placeholder="Nama tim {{ field.name|slice:'5:' }}" class="block w-full rounded-md bg-neutral-900 text-neutral-100 placeholder-neutral-400 border border-neutral-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 px-3 py-2">
       {% elif field.name == 'tipoff_at' %}
         <input type="datetime-local" name="{{ field.name }}" value="{{ field.value|date:'Y-m-d\TH:i' }}" class="block w-full rounded-md bg-neutral-900 text-neutral-100 border border-neutral-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 px-3 py-2">
       {% elif field.name == 'venue' %}
