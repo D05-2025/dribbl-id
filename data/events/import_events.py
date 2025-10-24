@@ -18,6 +18,6 @@ def import_events_from_csv(file_path):
             )
 
             if created:
-                print(f"✅ Event '{event.title}' berhasil ditambahkan.")
+                print(f"Event '{event.title}' berhasil ditambahkan.")
             else:
-                print(f"⚠️ Event '{event.title}' sudah ada, dilewati.")
+                print(f"Event '{event.title}' sudah ada, dilewati.")
