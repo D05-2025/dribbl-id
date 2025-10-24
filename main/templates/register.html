@@ -17,7 +17,7 @@
   </div>
 
   <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+    <div class="bg-neutral-900 py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-neutral-800">
       <!-- Messages -->
       {% if messages %}
         {% for message in messages %}
@@ -29,9 +29,9 @@
 
       <form class="space-y-6" method="POST">
         {% csrf_token %}
-        
+
         <div>
-          <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+          <label for="username" class="block text-sm font-medium text-neutral-200">Username</label>
           <div class="mt-1">
             <input id="username" name="username" type="text" required 
                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500"
@@ -40,7 +40,7 @@
         </div>
 
         <div>
-          <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+          <label for="password" class="block text-sm font-medium text-neutral-200">Password</label>
           <div class="mt-1">
             <input id="password" name="password" type="password" required 
                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500"
@@ -49,7 +49,7 @@
         </div>
 
         <div>
-          <label for="role" class="block text-sm font-medium text-gray-700">Account Type</label>
+          <label for="role" class="block text-sm font-medium text-neutral-200">Account Type</label>
           <div class="mt-1">
             <select id="role" name="role" 
                     class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500">
@@ -57,7 +57,7 @@
               <option value="admin">Admin</option>
             </select>
           </div>
-          <p class="mt-1 text-xs text-gray-500">Admin accounts can create and manage news</p>
+          <p class="mt-1 text-xs text-neutral-400">Admin accounts can create and manage matches</p>
         </div>
 
         <div>
@@ -69,7 +69,7 @@
       </form>
 
       <div class="mt-6 text-center">
-        <p class="text-sm text-gray-600">
+        <p class="text-sm text-neutral-400">
           Already have an account?
           <a href="{% url 'main:login' %}" class="font-medium text-orange-600 hover:text-orange-500">
             Sign in here

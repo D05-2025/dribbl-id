@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'main',
     'events',
     'news',
-    'players',
+    'matches',
+    'teams',
 ]
 
 LOGIN_REDIRECT_URL = '/'  
@@ -71,6 +72,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug', 
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -135,7 +137,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Jakarta'
 
 USE_I18N = True
 
@@ -156,3 +158,11 @@ else:
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+APPEND_SLASH = True
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.pbp.cs.ui.ac.id',
+    'https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id',
+]
+

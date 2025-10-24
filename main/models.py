@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 import uuid
 
@@ -12,10 +12,14 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, username, password=None, **extra_fields):
+        # superuser WAJIB punya ini:
         extra_fields.setdefault('role', 'admin')
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
         return self.create_user(username, password, **extra_fields)
 
-class CustomUser(AbstractBaseUser):
+class CustomUser(AbstractBaseUser, PermissionsMixin):   # ⬅️ tambahkan PermissionsMixin
     ROLE_CHOICES = [
         ('admin', 'Admin'),
         ('user', 'Regular User'),
@@ -27,22 +31,22 @@ class CustomUser(AbstractBaseUser):
     profile_picture = models.URLField(blank=True, null=True)
     role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='user')
     created_at = models.DateTimeField(auto_now_add=True)
-    
-    # Required fields
+
+    # flags
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    
-    # Django auth fields
+    is_superuser = models.BooleanField(default=False)
+
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
 
     def has_perm(self, perm, obj=None):
-        return self.role == 'admin'
+        return self.is_superuser or self.role == 'admin'
 
     def has_module_perms(self, app_label):
-        return self.role == 'admin'
+        return self.is_superuser or self.role == 'admin'
 
     def __str__(self):
         return f"{self.username} ({self.role})"

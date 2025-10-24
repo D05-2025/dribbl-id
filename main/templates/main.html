@@ -4,129 +4,79 @@
 {% block meta %}
 <title>DRIBBL.ID</title>
 <style>
-    body {
-        background-color: #000 !important;
-        color: #fff;
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-    }
-
-    .hero-section {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        padding: 6rem 3rem;
-        background: #000 !important;
-    }
-
-    .hero-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5rem;
-        max-width: 1200px;
-        width: 100%;
-        position: relative;
-    }
-
-    .hero-image {
-        flex: 0 0 600px;
-        display: flex;
-        justify-content: center;
-    }
-
-    .hero-image img {
-        width: 600px;
-        height: auto;
-        object-fit: contain;
-        filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.2));
-        transition: transform 0.4s ease;
-    }
-
-    .hero-image img:hover {
-        transform: scale(1.05);
-    }
-
-    .hero-text {
-        flex: 1;
-        min-width: 300px;
-        max-width: 600px;
-        word-wrap: break-word;
-        position: relative;
-    }
-
-    /* Efek ketik */
-    .type-title {
-        font-size: 3.5rem;
-        font-weight: 700;
-        line-height: 1.2;
-        display: inline;
-        position: relative;
-        text-transform: lowercase;
-        /* PASTIKAN TIDAK ADA white-space: pre DI SINI */
-    }
-
+    /* Minimal style block for just the typing cursor 
+      and the fade-in animation class.
+    */
     .cursor {
         display: inline-block;
-        width: 4px;
-        height: 2rem;  /* Sesuai dengan line-height teks */
+        width: 3px; /* A bit cleaner */
+        height: 2.5rem; /* Default, script will adjust */
         background-color: #fff;
         margin-left: 4px;
         animation: blink 0.75s step-end infinite;
-        vertical-align: middle;
-        margin-bottom: -0.5rem; /* Sedikit adjust vertical alignment */
+        vertical-align: bottom; /* Aligns better with text */
     }
 
     @keyframes blink {
         50% { opacity: 0; }
     }
 
-    /* Fade-in deskripsi */
-    .hero-text p {
-        font-size: 1.1rem;
-        color: #ccc;
-        line-height: 1.6;
-        margin-top: 20px;
-        opacity: 0;
-        animation: fadeIn 1.5s ease forwards;
-        animation-delay: 4.5s;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    @media (max-width: 900px) {
-        .hero-container {
-            flex-direction: column;
-            text-align: center;
-        }
-        .hero-image img {
-            width: 250px;
-        }
-        .type-title {
-            font-size: 2rem;
-        }
-        .cursor {
-            height: 2rem; /* Sesuaikan dengan font size mobile */
-        }
+    /* Simple class for the script to add */
+    .fade-in-p {
+        opacity: 1;
+        transition: opacity 1.5s ease;
     }
 </style>
 {% endblock meta %}
 
 {% block content %}
-<div class="hero-section">
-    <div class="hero-container">
-        <div class="hero-image">
-            <img src="{% static 'images/basketball.png' %}" alt="Basketball">
+<!-- 
+  This section is now built with Tailwind.
+  min-h-[calc(100vh-4rem)] ensures it fills the viewport 
+  below the 4rem (h-16) navbar from base.html.
+-->
+<div class="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-black text-white px-6 py-16 sm:py-24">
+    
+    <!-- 
+      Mobile-first: flex-col (stacked)
+      Large screens: lg:flex-row (side-by-side)
+    -->
+    <div class="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-20 max-w-7xl mx-auto">
+        
+        <!-- 
+          Image 
+          - Order 1 (top) on mobile.
+          - Better sizing: w-3/4 on mobile, scales up to lg:w-[500px].
+        -->
+        <div class="flex-shrink-0 order-1">
+            <img src="{% static 'images/basketball.png' %}" alt="Basketball" 
+                 class="w-3/4 sm:w-1/2 lg:w-[500px] xl:w-[600px] h-auto mx-auto filter drop-shadow-[0_0_25px_rgba(255,255,255,0.2)]">
         </div>
-        <div class="hero-text">
-            <h1 class="type-title"></h1><span class="cursor"></span>
-            <p>Indonesia's biggest basketball community! A place where passion meets the court, and every dribble, dunk, and dream matters.</p>
+
+        <!-- 
+          Text
+          - Order 2 (bottom) on mobile.
+          - text-center on mobile, lg:text-left on large screens.
+        -->
+        <div class="order-2 text-center lg:text-left">
+            <!-- 
+              Title for typing animation 
+              - Responsive font size: text-4xl (mobile) -> sm:text-5xl -> lg:text-6xl
+            -->
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold lowercase">
+                <span class="type-title"></span><span class="cursor"></span>
+            </h1>
+            
+            <!-- 
+              Paragraph
+              - Starts with opacity-0 (invisible).
+              - Script will add 'fade-in-p' class to fade it in.
+            -->
+            <p id="hero-description" class="text-lg text-gray-300 mt-6 max-w-lg opacity-0">
+                Indonesia's biggest basketball community! A place where passion meets the court, and every dribble, dunk, and dream matters.
+            </p>
         </div>
+
     </div>
 </div>
 
@@ -135,39 +85,41 @@
         const titleText = "welcome to dribbl.id";
         const titleElement = document.querySelector(".type-title");
         const cursor = document.querySelector(".cursor");
+        const description = document.getElementById("hero-description");
         let i = 0;
-        let audioContext;
 
-        function playTypeSound() {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(900, audioContext.currentTime);
-            gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 0.1);
+        // Function to dynamically set cursor height based on the title's line height
+        function updateCursorHeight() {
+            if (!titleElement.parentElement || !cursor) return;
+            // Get the computed style of the parent H1 tag
+            const titleStyle = window.getComputedStyle(titleElement.parentElement);
+            const titleFontSize = parseInt(titleStyle.fontSize, 10);
+            
+            // Set cursor height to match the actual font size for better alignment
+            cursor.style.height = `${titleFontSize}px`;
         }
 
         function typeEffect() {
             if (i < titleText.length) {
-                // PASTIKAN pakai textContent, bukan appendChild
                 titleElement.textContent = titleText.substring(0, i + 1);
-                
-                if (titleText.charAt(i) !== ' ') playTypeSound();
-
                 i++;
                 setTimeout(typeEffect, 100);
+            } else {
+                // Typing is finished
+                if (description) {
+                    // Explicitly remove opacity-0 and add fade-in class
+                    description.classList.remove('opacity-0');
+                    description.classList.add('fade-in-p');
+                }
             }
-            // Biarkan cursor tetap berkedip
         }
 
+        // Initial setup
+        updateCursorHeight();
         typeEffect();
+
+        // Adjust cursor height on window resize in case font size changes
+        window.addEventListener('resize', updateCursorHeight);
     });
 </script>
 {% endblock content %}
