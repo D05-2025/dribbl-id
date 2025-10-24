@@ -16,21 +16,21 @@
     </div>
 
     <!-- FILTER SECTION -->
-    <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+    <div class="bg-gray-800 rounded-lg border border-gray-600 p-6 mb-6">
       <form method="GET" action="{% url 'news:show_news_page' %}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <!-- Search Box -->
         <div>
-          <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Cari Berita</label>
-          <input type="text" id="search" name="search" value="{{ search_query|default:'' }}" 
-                 class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500" 
+          <label for="search" class="block text-sm font-medium text-gray-200 mb-2">Cari Berita</label>
+          <input type="text" id="search" name="search" value="{{ search_query|default:'' }}"
+                 class="w-full border border-gray-500 bg-gray-700 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400"
                  placeholder="Cari judul atau konten...">
         </div>
-        
+
         <!-- Category Filter -->
         <div>
-          <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
-          <select id="category" name="category" 
-                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500">
+          <label for="category" class="block text-sm font-medium text-gray-200 mb-2">Kategori</label>
+          <select id="category" name="category"
+                  class="w-full border border-gray-500 bg-gray-700 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400">
             <option value="">Semua Kategori</option>
             <option value="NBA" {% if selected_category == 'NBA' %}selected{% endif %}>NBA</option>
             <option value="IBL" {% if selected_category == 'IBL' %}selected{% endif %}>IBL</option>
@@ -40,36 +40,36 @@
             <option value="ANALYSIS" {% if selected_category == 'ANALYSIS' %}selected{% endif %}>Team & Player Analysis</option>
           </select>
         </div>
-        
+
         <!-- Sort Filter -->
         <div>
-          <label for="sort" class="block text-sm font-medium text-gray-700 mb-2">Urutkan</label>
-          <select id="sort" name="sort" 
-                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500">
+          <label for="sort" class="block text-sm font-medium text-gray-200 mb-2">Urutkan</label>
+          <select id="sort" name="sort"
+                  class="w-full border border-gray-500 bg-gray-700 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400">
             <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Terbaru</option>
             <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>Terlama</option>
             <option value="title_asc" {% if selected_sort == 'title_asc' %}selected{% endif %}>Judul A-Z</option>
             <option value="title_desc" {% if selected_sort == 'title_desc' %}selected{% endif %}>Judul Z-A</option>
           </select>
         </div>
-        
+
         <!-- Buttons -->
         <div class="flex items-end space-x-2">
-          <button type="submit" class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-md font-medium hover:bg-gray-700 transition-colors">
+          <button type="submit" class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-md font-medium hover:bg-gray-500 transition-colors">
             Filter
           </button>
-          <a href="{% url 'news:show_news_page' %}" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition-colors">
+          <a href="{% url 'news:show_news_page' %}" class="px-4 py-2 border border-gray-500 text-gray-200 rounded-md font-medium hover:bg-gray-700 transition-colors">
             Reset
           </a>
         </div>
       </form>
-      
+
       <!-- Results Info -->
       {% if selected_category or search_query or selected_sort != 'newest' %}
       <div class="mt-4 flex items-center justify-between">
-        <div class="text-sm text-gray-600">
+        <div class="text-sm text-gray-300">
           {% if selected_category %}
-            <span class="font-medium">Kategori:</span> 
+            <span class="font-medium">Kategori:</span>
             {% if selected_category == 'nba' %}NBA
             {% elif selected_category == 'ibl' %}IBL
             {% elif selected_category == 'fiba' %}FIBA
@@ -82,14 +82,14 @@
             <span class="font-medium ml-3">Pencarian:</span> "{{ search_query }}"
           {% endif %}
           {% if selected_sort != 'newest' %}
-            <span class="font-medium ml-3">Urutan:</span> 
+            <span class="font-medium ml-3">Urutan:</span>
             {% if selected_sort == 'oldest' %}Terlama
             {% elif selected_sort == 'title_asc' %}Judul A-Z
             {% elif selected_sort == 'title_desc' %}Judul Z-A
             {% endif %}
           {% endif %}
         </div>
-        <div class="text-sm text-gray-600">
+        <div class="text-sm text-gray-300">
           Ditemukan: <span class="font-bold">{{ news_list|length }}</span> berita
         </div>
       </div>
@@ -98,7 +98,7 @@
     <!-- END FILTER SECTION -->
 
     {% if user.is_authenticated and user.role == 'admin' %}
-    <button onclick="showModal()" class="inline-flex items-center px-4 py-2 bg-white text-gray-700 font-semibold outline outline-2 outline-gray-600 outline-offset-[-2px] rounded-md hover:bg-gray-600 hover:text-white transition-colors mb-6">
+    <button onclick="showModal()" class="inline-flex items-center px-4 py-2 bg-gray-700 text-gray-200 font-semibold outline outline-2 outline-gray-500 outline-offset-[-2px] rounded-md hover:bg-gray-600 hover:text-white transition-colors mb-6">
       Create News
     </button>
     {% endif %}
@@ -106,41 +106,41 @@
     <!-- News Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {% for news in news_list %}
-      <article class="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300 overflow-hidden flex flex-col h-full">
+      <article class="bg-gray-800 rounded-lg border border-gray-600 hover:shadow-lg transition-shadow duration-300 overflow-hidden flex flex-col h-full">
         <div class="aspect-[16/9] relative overflow-hidden">
           {% if news.thumbnail %}
           <img src="{{ news.thumbnail }}" alt="{{ news.title }}" class="w-full h-full object-cover">
           {% else %}
-          <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-            <i class="fas fa-basketball-ball text-gray-400 text-3xl"></i>
+          <div class="w-full h-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center">
+            <i class="fas fa-basketball-ball text-gray-300 text-3xl"></i>
           </div>
           {% endif %}
           <div class="absolute top-3 left-3">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-gray-600 text-white">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-gray-500 text-white">
               {{ news.get_category_display }}
             </span>
           </div>
         </div>
         <div class="p-5 flex flex-col flex-1">
-          <div class="flex items-center text-sm text-gray-500 mb-3">
+          <div class="flex items-center text-sm text-gray-400 mb-3">
             <time>{{ news.published_at|date:"d M Y" }}</time>
           </div>
-          <h3 class="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 leading-tight">
-            <a href="{% url 'news:show_news_detail' news.id %}" class="hover:text-gray-600 transition-colors">
+          <h3 class="text-lg font-semibold text-white mb-3 line-clamp-2 leading-tight">
+            <a href="{% url 'news:show_news_detail' news.id %}" class="hover:text-gray-300 transition-colors">
               {{ news.title }}
             </a>
           </h3>
-          <p class="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">
+          <p class="text-gray-300 text-sm leading-relaxed line-clamp-3 mb-4">
             {{ news.content|truncatewords:30 }}
           </p>
-          <div class="pt-4 border-t border-gray-100 flex items-center justify-between mt-auto">
-            <a href="{% url 'news:show_news_detail' news.id %}" class="text-gray-600 hover:text-gray-700 font-medium text-sm transition-colors">
+          <div class="pt-4 border-t border-gray-600 flex items-center justify-between mt-auto">
+            <a href="{% url 'news:show_news_detail' news.id %}" class="text-gray-300 hover:text-gray-200 font-medium text-sm transition-colors">
               Read more
             </a>
             {% if user.is_authenticated and user.role == 'admin' %}
             <div class="flex space-x-2">
-              <button onclick="editNews('{{ news.id }}')" class="text-blue-600 hover:text-blue-700 text-sm transition-colors">Edit</button>
-              <button onclick="deleteNews('{{ news.id }}')" class="text-red-600 hover:text-red-700 text-sm transition-colors">Delete</button>
+              <button onclick="editNews('{{ news.id }}')" class="text-blue-400 hover:text-blue-300 text-sm transition-colors">Edit</button>
+              <button onclick="deleteNews('{{ news.id }}')" class="text-red-400 hover:text-red-300 text-sm transition-colors">Delete</button>
             </div>
             {% endif %}
           </div>
@@ -148,12 +148,12 @@
       </article>
       {% empty %}
       <div class="col-span-full">
-        <div class="bg-white rounded-lg border border-gray-200 p-12 text-center">
+        <div class="bg-gray-800 rounded-lg border border-gray-600 p-12 text-center">
           <div class="w-32 h-32 mx-auto mb-4">
             <img src="{% static 'images/no-news.png' %}" alt="No news available" class="w-full h-full object-contain">
           </div>
-          <h3 class="text-lg font-medium text-gray-900 mb-2">No news found</h3>
-          <p class="text-gray-600">Try changing your filters or search terms.</p>
+          <h3 class="text-lg font-medium text-white mb-2">No news found</h3>
+          <p class="text-gray-300">Try changing your filters or search terms.</p>
         </div>
       </div>
       {% endfor %}

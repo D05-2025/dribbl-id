@@ -31,7 +31,7 @@
 {# Modal container #}
 <div id="modalAddMatch" class="fixed inset-0 z-50 hidden">
   <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" data-close-modal></div>
-  <div class="relative mx-auto mt-20 w-[92%] max-w-xl rounded-2xl border border-neutral-800 bg-neutral-950 p-5">
+  <div class="relative mx-auto mt-20 mb-4 w-[92%] max-w-xl rounded-2xl border border-neutral-800 bg-neutral-950 p-5 max-h-[calc(100vh-6rem)] overflow-y-auto">
     <h2 class="text-lg font-semibold text-white mb-3">Tambah Match</h2>
     <div id="modalBody">
       <div class="text-neutral-400">Memuat formulir…</div>
@@ -101,6 +101,8 @@
               const child = temp.firstElementChild;
               if (child) list.insertBefore(child, list.firstChild);
             }
+          // Show success notification
+          showToast('Match berhasil ditambahkan!', '', 'success');
           closeModal();
         } else {
           // render ulang form dengan error
@@ -113,6 +115,27 @@
     }
   });
 })();
+
+// ==================== TOAST NOTIFICATION ====================
+function showToast(title, message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg border-l-4 max-w-sm z-50 ${
+    type === 'success' ? 'bg-green-50 border-green-500 text-green-700' :
+    type === 'error' ? 'bg-red-50 border-red-500 text-red-700' :
+    'bg-gray-50 border-gray-500 text-gray-700'
+  }`;
+
+  toast.innerHTML = `
+    <div class="font-semibold">${title}</div>
+    ${message ? `<div class="text-sm mt-1">${message}</div>` : ''}
+  `;
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 5000);
+}
 </script>
 
 {% endblock %}
