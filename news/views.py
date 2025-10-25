@@ -13,43 +13,37 @@ from django.views.decorators.http import require_POST
 from django.utils.html import strip_tags
 from news.models import News
 from news.forms import NewsForm
-
+from django.contrib.auth.decorators import login_required
 from main.decorators import login_required_custom
 
 from django.db.models import Q
 
-@login_required_custom
+@login_required
 def show_news_page(request):
-    # Get filter parameters from URL
     category_filter = request.GET.get('category', '')
     sort_by = request.GET.get('sort', 'newest')
     search_query = request.GET.get('search', '')
     
-    # Start with all news
     news_list = News.objects.all()
     
-    # Apply category filter
     if category_filter:
         news_list = news_list.filter(category=category_filter)
     
-    # Apply search filter
     if search_query:
         news_list = news_list.filter(
             Q(title__icontains=search_query) | 
             Q(content__icontains=search_query)
         )
     
-    # Apply sorting
     if sort_by == 'oldest':
         news_list = news_list.order_by('published_at')
     elif sort_by == 'title_asc':
         news_list = news_list.order_by('title')
     elif sort_by == 'title_desc':
         news_list = news_list.order_by('-title')
-    else:  # newest (default)
+    else:  
         news_list = news_list.order_by('-published_at')
     
-    # Get category choices from model for filter dropdown
     categories = News.CATEGORY_CHOICES
     
     context = {
