@@ -5,7 +5,7 @@
 <div class="max-w-4xl mx-auto px-4 py-6">
   <div class="flex items-center justify-between mb-4">
     <h1 class="text-2xl font-bold text-white">Jadwal Pertandingan</h1>
-    {% if request.user.is_authenticated %}
+     {% if user.is_authenticated and user.role == 'admin' %}
     <button id="btnAddMatch"
       class="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">
       + Tambah Match
@@ -19,10 +19,12 @@
     {% empty %}
       <div class="bg-neutral-950 border border-neutral-800 rounded-xl p-8 text-center">
         <p class="text-neutral-400">Belum ada pertandingan yang dijadwalkan.</p>
+        {% if user.is_authenticated and user.role == 'admin' %}
         <a href="{% url 'matches:create' %}"
            class="inline-flex items-center mt-4 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition">
           Buat Pertandingan Pertama
         </a>
+        {% endif %}
       </div>
     {% endfor %}
   </div>
