@@ -17,51 +17,53 @@
 
     <!-- FILTER SECTION -->
     <div class="bg-gray-800 rounded-lg border border-gray-600 p-8 mb-6">
-      <form method="GET" action="{% url 'news:show_news_page' %}" class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <!-- Search Box -->
-        <div>
-          <label for="search" class="block text-sm font-medium text-gray-200 mb-2">Cari Berita</label>
-          <input type="text" id="search" name="search" value="{{ search_query|default:'' }}"
-                 class="w-full border border-gray-500 bg-gray-700 text-white rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-400"
-                 placeholder="Cari judul atau konten...">
-        </div>
+      <form method="GET" action="{% url 'news:show_news_page' %}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Search -->
+    <div>
+      <label for="search" class="block text-sm font-medium text-gray-200 mb-2">Cari Berita</label>
+      <input type="text" id="search" name="search" value="{{ search_query|default:'' }}"
+            class="w-full border border-gray-500 bg-gray-700 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            placeholder="Cari judul atau konten...">
+    </div>
 
-        <!-- Category Filter -->
-        <div>
-          <label for="category" class="block text-sm font-medium text-gray-200 mb-2">Kategori</label>
-          <select id="category" name="category"
-                  class="w-full border border-gray-500 bg-gray-700 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400">
-            <option value="">Semua Kategori</option>
-            <option value="nba" {% if selected_category == 'nba' %}selected{% endif %}>NBA</option>
-            <option value="ibl" {% if selected_category == 'ibl' %}selected{% endif %}>IBL</option>
-            <option value="fiba" {% if selected_category == 'fiba' %}selected{% endif %}>FIBA</option>
-            <option value="transfer" {% if selected_category == 'transfer' %}selected{% endif %}>Transfers & Trades</option>
-            <option value="highlight" {% if selected_category == 'highlight' %}selected{% endif %}>Game Highlights</option>
-            <option value="analysis" {% if selected_category == 'analysis' %}selected{% endif %}>Team & Player Analysis</option>
-          </select>
-        </div>
-        <!-- Sort Filter -->
-        <div>
-          <label for="sort" class="block text-sm font-medium text-gray-200 mb-2">Urutkan</label>
-          <select id="sort" name="sort"
-                  class="w-full border border-gray-500 bg-gray-700 text-white rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-400">
-            <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Terbaru</option>
-            <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>Terlama</option>
-            <option value="title_asc" {% if selected_sort == 'title_asc' %}selected{% endif %}>Judul A-Z</option>
-            <option value="title_desc" {% if selected_sort == 'title_desc' %}selected{% endif %}>Judul Z-A</option>
-          </select>
-        </div>
+    <!-- Category -->
+    <div>
+      <label for="category" class="block text-sm font-medium text-gray-200 mb-2">Kategori</label>
+      <select id="category" name="category"
+              class="w-full border border-gray-500 bg-gray-700 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400">
+        <option value="">Semua Kategori</option>
+        <option value="nba" {% if selected_category == 'nba' %}selected{% endif %}>NBA</option>
+        <option value="ibl" {% if selected_category == 'ibl' %}selected{% endif %}>IBL</option>
+        <option value="fiba" {% if selected_category == 'fiba' %}selected{% endif %}>FIBA</option>
+        <option value="transfer" {% if selected_category == 'transfer' %}selected{% endif %}>Transfers & Trades</option>
+        <option value="highlight" {% if selected_category == 'highlight' %}selected{% endif %}>Game Highlights</option>
+        <option value="analysis" {% if selected_category == 'analysis' %}selected{% endif %}>Team & Player Analysis</option>
+      </select>
+    </div>
 
-        <!-- Buttons -->
-        <div class="flex items-end space-x-2">
-          <button type="submit" class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-md font-medium hover:bg-gray-500 transition-colors">
-            Filter
-          </button>
-          <a href="{% url 'news:show_news_page' %}" class="px-4 py-2 border border-gray-500 text-gray-200 rounded-md font-medium hover:bg-gray-700 transition-colors">
-            Reset
-          </a>
-        </div>
-      </form>
+    <!-- Sort -->
+    <div>
+      <label for="sort" class="block text-sm font-medium text-gray-200 mb-2">Urutkan</label>
+      <select id="sort" name="sort"
+              class="w-full border border-gray-500 bg-gray-700 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400">
+        <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Terbaru</option>
+        <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>Terlama</option>
+        <option value="title_asc" {% if selected_sort == 'title_asc' %}selected{% endif %}>Judul A-Z</option>
+        <option value="title_desc" {% if selected_sort == 'title_desc' %}selected{% endif %}>Judul Z-A</option>
+      </select>
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex flex-col sm:flex-row items-end sm:items-center gap-2">
+      <button type="submit" class="w-full sm:w-auto flex-1 bg-gray-600 text-white px-4 py-2 rounded-md font-medium hover:bg-gray-500 transition-colors">
+        Filter
+      </button>
+      <a href="{% url 'news:show_news_page' %}" class="w-full sm:w-auto px-4 py-2 border border-gray-500 text-gray-200 rounded-md font-medium hover:bg-gray-700 transition-colors text-center">
+        Reset
+      </a>
+    </div>
+  </form>
+
 
       <!-- Results Info -->
       {% if selected_category or search_query or selected_sort != 'newest' %}
