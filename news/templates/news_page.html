@@ -32,15 +32,14 @@
           <select id="category" name="category"
                   class="w-full border border-gray-500 bg-gray-700 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400">
             <option value="">Semua Kategori</option>
-            <option value="NBA" {% if selected_category == 'NBA' %}selected{% endif %}>NBA</option>
-            <option value="IBL" {% if selected_category == 'IBL' %}selected{% endif %}>IBL</option>
-            <option value="FIBA" {% if selected_category == 'FIBA' %}selected{% endif %}>FIBA</option>
-            <option value="TRANSFER" {% if selected_category == 'TRANSFER' %}selected{% endif %}>Transfers & Trades</option>
-            <option value="HIGHLIGHT" {% if selected_category == 'HIGHLIGHT' %}selected{% endif %}>Game Highlights</option>
-            <option value="ANALYSIS" {% if selected_category == 'ANALYSIS' %}selected{% endif %}>Team & Player Analysis</option>
+            <option value="nba" {% if selected_category == 'nba' %}selected{% endif %}>NBA</option>
+            <option value="ibl" {% if selected_category == 'ibl' %}selected{% endif %}>IBL</option>
+            <option value="fiba" {% if selected_category == 'fiba' %}selected{% endif %}>FIBA</option>
+            <option value="transfer" {% if selected_category == 'transfer' %}selected{% endif %}>Transfers & Trades</option>
+            <option value="highlight" {% if selected_category == 'highlight' %}selected{% endif %}>Game Highlights</option>
+            <option value="analysis" {% if selected_category == 'analysis' %}selected{% endif %}>Team & Player Analysis</option>
           </select>
         </div>
-
         <!-- Sort Filter -->
         <div>
           <label for="sort" class="block text-sm font-medium text-gray-200 mb-2">Urutkan</label>
@@ -94,7 +93,6 @@
         </div>
       </div>
       {% endif %}
-    </div>
     <!-- END FILTER SECTION -->
 
     {% if user.is_authenticated and user.role == 'admin' %}
