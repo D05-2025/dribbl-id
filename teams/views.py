@@ -5,11 +5,10 @@ from django.urls import reverse
 from django.template.defaultfilters import truncatewords, slugify
 from django.views.decorators.http import require_POST, require_http_methods
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 # Import Q object for searching
 from django.db.models import Q
 
-# Import your decorator
-from main.decorators import login_required_custom
 from .models import Team
 from .forms import TeamForm
 from functools import wraps
@@ -25,7 +24,7 @@ def admin_required_ajax(view_func):
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 
-@login_required_custom
+@login_required
 def show_teams(request):
     """
     Displays the list of all teams and includes the form for adding a new team.
