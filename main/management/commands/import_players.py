@@ -1,40 +1,69 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
-from players.models import Player
 from pathlib import Path
 import csv
 
+from players.models import Player
+
+def to_float(v, default=0.0):
+    if v is None:
+        return default
+    s = str(v).strip()
+    if s in ("", "-", "NA", "None"):
+        return default
+    try:
+        return float(s)
+    except Exception:
+        return default
+
 class Command(BaseCommand):
-    help = "Import player statistics from a CSV file (NBA 2024)"
+    help = "Import NBA 2024 per-game players from CSV (Basketball-Reference style)."
 
     def add_arguments(self, parser):
         parser.add_argument("csv_path", nargs="?", help="Path to CSV file")
+        parser.add_argument("--include-tot", action="store_true",
+                            help='Include rows with Tm="TOT" (default: skipped)')
 
     def handle(self, *args, **options):
-        csv_path = options.get("csv_path") or "main/management/commands/NBA_2024_per_game(03-01-2024).csv"
-        p = Path(csv_path)
+        rel = options.get("csv_path") or "main/management/commands/NBA_2024_per_game(03-01-2024).csv"
+        p = Path(rel)
         if not p.is_absolute():
             p = Path(settings.BASE_DIR) / p
-
         if not p.exists():
             raise CommandError(f"File tidak ditemukan: {p}")
 
-        self.stdout.write(self.style.NOTICE(f"Mengimpor data pemain dari: {p}"))
+        include_tot = options.get("include_ttot") or options.get("include_tot")  # tolerate typo
+        created = updated = 0
 
-        with open(p, newline='', encoding="utf-8") as csvfile:
-            reader = csv.DictReader(csvfile)
-            count = 0
+        self.stdout.write(self.style.NOTICE(f"Mengimpor data pemain dari: {p}"))
+        with open(p, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
             for row in reader:
-                # Mapping ke model Player — sesuaikan dengan kolom di CSV
-                Player.objects.update_or_create(
-                    full_name=row.get("Player"),
+                name = row.get("Player")
+                team = row.get("Tm")
+                pos  = row.get("Pos") or ""
+
+                if not name or not team:
+                    continue
+                if team == "TOT" and not include_tot:
+                    # lewati baris agregat supaya tidak menimpa data per tim
+                    continue
+
+                pts = to_float(row.get("PTS"))
+                reb = to_float(row.get("TRB") or row.get("REB"))
+                ast = to_float(row.get("AST"))
+
+                obj, is_created = Player.objects.update_or_create(
+                    name=name,
+                    team=team,                # lookup unik: (name, team)
                     defaults={
-                        "team": row.get("Tm", ""),
-                        "position": row.get("Pos", ""),
-                        "jersey_number": 0,  # opsional
-                        "is_active": True,
+                        "position": pos,
+                        "points_per_game": pts,
+                        "rebounds_per_game": reb,
+                        "assists_per_game": ast,
                     },
                 )
-                count += 1
+                created += int(is_created)
+                updated += int(not is_created)
 
-        self.stdout.write(self.style.SUCCESS(f"Import selesai! Total {count} pemain diimpor."))
+        self.stdout.write(self.style.SUCCESS(f"Selesai. Created: {created}, Updated: {updated}"))
