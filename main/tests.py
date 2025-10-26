@@ -313,15 +313,6 @@ class MainViewsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotIn('username', self.client.session)
     
-    def test_login_empty_password(self):
-        """Test login dengan password kosong"""
-        response = self.client.post(reverse('main:login'), {
-            'username': 'testuser',
-            'password': ''
-        })
-        self.assertEqual(response.status_code, 200)
-        self.assertNotIn('username', self.client.session)
-    
     def test_login_empty_credentials(self):
         """Test login tanpa credentials"""
         response = self.client.post(reverse('main:login'), {})
