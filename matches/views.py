@@ -215,7 +215,7 @@ def matches_json(request):
         "home_score": m.home_score,
         "away_score": m.away_score,
     } for m in matches]
-    return JsonResponse({"matches": data})
+    return JsonResponse(data, safe=False)
 
 
 def matches_xml(request):

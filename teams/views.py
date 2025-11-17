@@ -13,6 +13,20 @@ from .models import Team
 from .forms import TeamForm
 from functools import wraps
 
+def show_json(request):
+    teams = Team.objects.all()
+
+    data = [
+        {
+            'name': t.name,
+            'logo': t.logo,
+            'region': t.region,
+            'founded': t.founded.strftime('%Y-%m-%d'),
+            'description': t.description
+        } for t in teams
+    ]
+    return JsonResponse(data, safe=False)
+
 # Helper decorator for admin-only AJAX views
 def admin_required_ajax(view_func):
     @wraps(view_func)
@@ -148,5 +162,3 @@ def team_detail(request, team_name):
         'team': team
     }
     return render(request, 'team_detail.html', context)
-
-

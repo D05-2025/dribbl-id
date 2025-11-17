@@ -13,6 +13,6 @@ urlpatterns = [
     path("<int:pk>/delete/", views.match_delete, name="delete"),
     path("<int:pk>/boxscore/add/", views.boxscore_add, name="boxscore_add"),
     path("<int:pk>/boxscore/<int:box_id>/edit/", views.boxscore_edit, name="boxscore_edit"),
-    path("api/json/", views.matches_json, name="api_json"),
+    path("json/", views.matches_json, name="api_json"),
     path("api/xml/", views.matches_xml, name="api_xml"),
 ]

@@ -5,12 +5,15 @@ from .views import (
     team_detail, 
     get_team, 
     edit_team, 
-    delete_team
+    delete_team,
+    show_json
 )
 
 app_name = 'teams'
 
 urlpatterns = [
+    path('json/', show_json, name='show_json'),
+
     path('', show_teams, name='show_teams'),
     path('add/', add_team, name='add_team'),
     path('<str:team_name>/', team_detail, name='team_detail'),

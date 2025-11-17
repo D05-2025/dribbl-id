@@ -2,6 +2,23 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponseForbidden
 from .models import Event
 
+def show_json(request):
+    events = Event.objects.all()
+
+    data = [
+        {
+            'id': e.id,
+            'title': e.title,
+            'description': e.description,
+            'date': e.date.strftime('%Y-%m-%d'),
+            'time': e.time,
+            'image_url': e.image_url,
+            'is_public': e.is_public,
+            'location': e.location
+        } for e in events
+    ]
+    return JsonResponse(data, safe=False)
+
 def event_list(request):
     user_id = request.session.get('user_id')
     user_role = request.session.get('role')

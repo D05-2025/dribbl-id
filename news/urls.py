@@ -5,7 +5,7 @@ app_name = 'news'
 urlpatterns = [
     path('', show_news_page, name='show_news_page'),
     
-    path('news-json/', show_json, name='show_json'),
+    path('json/', show_json, name='show_json'),
     path('json/<uuid:news_id>/', show_json_by_id, name='show_json_by_id'),
     path('get-news-json/<uuid:id>/', get_news_json, name='get_news_json'),
     path('add-news-entry-ajax/', add_news_entry_ajax, name='add_news_entry_ajax'),

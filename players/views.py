@@ -1,8 +1,23 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 from .models import Player
 from .forms import PlayerForm
+
+def show_json(request):
+    players = Player.objects.all()
+
+    data = [
+        {
+            'name': p.name,
+            'position': p.position,
+            'team': p.team,
+            'points_per_game': p.points_per_game,
+            'assists_per_game': p.assists_per_game,
+            'rebounds_per_game': p.rebounds_per_game
+        } for p in players
+    ]
+    return JsonResponse(data, safe=False)
 
 def player_list(request):
     players = Player.objects.all()
