@@ -18,6 +18,26 @@ from main.decorators import login_required_custom
 
 from django.db.models import Q
 
+
+@csrf_exempt
+def add_news_flutter(request):
+    title = strip_tags(request.POST.get("title", "").strip())
+    content = strip_tags(request.POST.get("content", "").strip())
+    category = request.POST.get("category", "").strip()
+    thumbnail = request.POST.get("thumbnail", "").strip() or None
+
+    new_news = News(
+        title=title, 
+        content=content,
+        category=category,
+        thumbnail=thumbnail,
+        user=request.user
+    )
+    new_news.save()
+
+    return JsonResponse({"status": "success"}, status=200)
+
+
 @login_required
 def show_news_page(request):
     category_filter = request.GET.get('category', '')
