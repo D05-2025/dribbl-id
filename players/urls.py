@@ -4,6 +4,7 @@ app_name = 'players'
 
 urlpatterns = [
     path('json/', views.show_json, name='show_json'),
+    path('create-flutter/', views.create_player_flutter, name='create_player_flutter'),
 
     path('', views.player_list, name='player_list'),
     path('add/', views.add_player, name='add_player'),
