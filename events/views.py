@@ -1,6 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponseForbidden
 from .models import Event
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.html import strip_tags
+import json
+from django.http import JsonResponse
 
 def show_json(request):
     events = Event.objects.all()
@@ -127,3 +131,37 @@ def delete_event(request, event_id):
         return JsonResponse({'message': 'Event berhasil dihapus!'})
 
     return redirect('events:event_list')
+
+@csrf_exempt
+def create_events_flutter(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "error", "message": "Invalid JSON format"}, status=400)
+
+        title = strip_tags(data.get("title", ""))
+        description = strip_tags(data.get("description", ""))
+        date_str = data.get("date", None)
+        thumbnail = data.get("image_url", "")
+        is_public = data.get("is_public", True)
+        location = strip_tags(data.get("location", ""))
+        time_str = data.get("time", None)
+
+        user = request.user
+        
+        new_events = Event(
+            title=title,
+            description=description,
+            date=date_str,
+            is_public=is_public,
+            created_by_id=user.id,
+            image_url=thumbnail,
+            location=location,
+            time=time_str
+        )
+        new_events.save()
+        
+        return JsonResponse({"status": "success"}, status=201)
+    else:
+        return JsonResponse({"status": "error", "message": "Method not allowed"}, status=405)
