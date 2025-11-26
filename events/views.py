@@ -135,9 +135,6 @@ def delete_event(request, event_id):
 @csrf_exempt
 def create_events_flutter(request):
     if request.method == 'POST':
-        if not request.user.is_authenticated:
-            return JsonResponse({"status": "error", "message": "User not authenticated"}, status=403)
-            
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
