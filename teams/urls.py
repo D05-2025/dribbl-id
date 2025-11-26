@@ -6,7 +6,8 @@ from .views import (
     get_team, 
     edit_team, 
     delete_team,
-    show_json
+    show_json, 
+    create_team_flutter
 )
 
 app_name = 'teams'
@@ -22,5 +23,7 @@ urlpatterns = [
     path('get/<str:team_name>/', get_team, name='get_team_data'),
     path('edit/<str:team_name>/', edit_team, name='edit_team'),
     path('delete/<str:team_name>/', delete_team, name='delete_team'),
+
+    path('create-flutter/', create_team_flutter, name='create_team_flutter'),
 ]
 

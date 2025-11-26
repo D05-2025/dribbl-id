@@ -14,6 +14,12 @@ from .models import Match, PlayerBoxScore
 from xml.etree.ElementTree import Element, SubElement, tostring
 from xml.dom import minidom
 
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Match
+from django.utils.dateparse import parse_datetime
+
 
 # ---- helpers ----------------------------------------------------------------
 def _is_ajax(request):
@@ -235,3 +241,30 @@ def matches_xml(request):
     xml_str = tostring(root, encoding="unicode")
     pretty_xml = minidom.parseString(xml_str).toprettyxml(indent="  ")
     return HttpResponse(pretty_xml, content_type="application/xml")
+
+@csrf_exempt
+def create_match_flutter(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            
+            # Pastikan format datetime sesuai (ISO 8601 biasanya dikirim flutter)
+            # Contoh format: "2025-10-24T19:30:00"
+            
+            new_match = Match.objects.create(
+                home_team=data["home_team"],
+                away_team=data["away_team"],
+                tipoff_at=parse_datetime(data["tipoff_at"]),
+                venue=data["venue"],
+                image_url=data["image_url"],
+                status=data["status"], # scheduled, live, finished
+                home_score=int(data.get("home_score", 0)),
+                away_score=int(data.get("away_score", 0)),
+            )
+            
+            new_match.save()
+            return JsonResponse({"status": "success"}, status=200)
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+    return JsonResponse({"status": "error", "message": "Invalid method"}, status=401)

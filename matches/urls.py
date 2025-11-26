@@ -15,4 +15,5 @@ urlpatterns = [
     path("<int:pk>/boxscore/<int:box_id>/edit/", views.boxscore_edit, name="boxscore_edit"),
     path("json/", views.matches_json, name="api_json"),
     path("api/xml/", views.matches_xml, name="api_xml"),
+    path('create-flutter/', views.create_match_flutter, name='create_match_flutter'),
 ]
