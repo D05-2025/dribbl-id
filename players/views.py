@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, JsonResponse
 from .models import Player
 from .forms import PlayerForm
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 def show_json(request):
     players = Player.objects.all()
@@ -59,3 +61,34 @@ def delete_player(request, player_id):
         player.delete()
         return redirect('players:player_list')  
     return render(request, 'players/player_delete.html', {'player': player})
+
+
+@csrf_exempt
+def create_player_flutter(request):
+    if request.method == 'POST':
+        
+        data = json.loads(request.body)
+
+        name = data.get("name")
+        position = data.get("position")
+        team = data.get("team")
+        points_per_game = data.get("points_per_game")
+        assists_per_game = data.get("assists_per_game")
+        rebounds_per_game = data.get("rebounds_per_game")
+
+        new_player = Player(
+            name=name,
+            position=position,
+            team=team,
+            points_per_game=points_per_game,
+            assists_per_game=assists_per_game,
+            rebounds_per_game=rebounds_per_game
+        )
+
+        
+        new_player.save()
+
+        return JsonResponse({"status": "success"}, status=200)
+    
+    else:
+        return JsonResponse({"status": "error"}, status=401)
