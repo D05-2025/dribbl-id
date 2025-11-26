@@ -142,21 +142,21 @@ def create_events_flutter(request):
 
         title = strip_tags(data.get("title", ""))
         description = strip_tags(data.get("description", ""))
-        date_str = data.get("date", None) 
+        date_str = data.get("date", None)
         thumbnail = data.get("thumbnail", "")
-        is_public = data.get("is_public", True) 
+        is_public = data.get("is_public", True)
         location = strip_tags(data.get("location", ""))
-        time_str = data.get("time", None) 
+        time_str = data.get("time", None)
 
         user = request.user
         
         new_events = Event(
             title=title,
             description=description,
-            date=date_str, 
+            date=date_str,
             is_public=is_public,
             created_by_id=user.id,
-            image_url=thumbnail, 
+            image_url=thumbnail,
             location=location,
             time=time_str
         )
