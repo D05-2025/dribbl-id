@@ -13,6 +13,12 @@ from .models import Team
 from .forms import TeamForm
 from functools import wraps
 
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Team
+from datetime import datetime
+
 def show_json(request):
     teams = Team.objects.all()
 
@@ -162,3 +168,29 @@ def team_detail(request, team_name):
         'team': team
     }
     return render(request, 'team_detail.html', context)
+
+@csrf_exempt
+def create_team_flutter(request):
+    if request.method == 'POST':
+        try:
+            # Jika menggunakan pbp_django_auth, data dikirim sebagai json body
+            data = json.loads(request.body)
+            
+            # Validasi jika user admin (opsional, sesuaikan logic authentication kamu)
+            # if not request.user.is_authenticated or request.user.role != 'admin':
+            #     return JsonResponse({"status": "error", "message": "Unauthorized"}, status=403)
+
+            new_team = Team.objects.create(
+                name=data["name"],
+                logo=data["logo"],
+                region=data["region"],
+                founded=datetime.strptime(data["founded"], "%Y-%m-%d").date(),
+                description=data["description"]
+            )
+            
+            new_team.save()
+            return JsonResponse({"status": "success"}, status=200)
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+            
+    return JsonResponse({"status": "error", "message": "Invalid method"}, status=401)
