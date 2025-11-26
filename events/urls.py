@@ -5,6 +5,7 @@ app_name = 'events'
 
 urlpatterns = [
     path('json/', views.show_json, name='event_json'),
+    path('create-flutter', views.create_event_flutter, name='create_event_flutter'),
 
     path('', views.event_list, name='event_list'),
     path('create/', views.create_event, name='create_event'),
