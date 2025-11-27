@@ -1,4 +1,4 @@
-from django.contrib.auth import login as auth_login, logout as auth_logout
+from django.contrib.auth import authenticate,login as auth_login, logout as auth_logout
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from main.models import CustomUser 
@@ -10,7 +10,7 @@ import json
 def login(request):
     username = request.POST['username']
     password = request.POST['password']
-    user = CustomUser.objects.get(username=username,password=password)
+    user = authenticate(username=username,password=password)
     if user is not None:
         if user.is_active:
             auth_login(request, user)
