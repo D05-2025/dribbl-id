@@ -50,7 +50,8 @@ def register(request):
             }, status=400)
         
         # Create the new user
-        user = CustomUser.objects.create(username=username, password=password, role=role)
+        user = CustomUser.objects.create(username=username, role=role)
+        user.set_password(password)
         user.save()
         
         return JsonResponse({
