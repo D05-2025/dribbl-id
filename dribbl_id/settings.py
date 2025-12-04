@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'matches',
     'teams',
     'players',
+    'authentication'
 ]
 
 LOGIN_REDIRECT_URL = '/'  
