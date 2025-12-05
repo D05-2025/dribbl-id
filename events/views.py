@@ -166,7 +166,7 @@ def create_events_flutter(request):
     else:
         return JsonResponse({"status": "error", "message": "Method not allowed"}, status=405)
     
-srf_exempt
+@csrf_exempt
 def delete_event_flutter(request):
     if request.method == 'POST':
         # 🔥 Cek session role (sama seperti create_events_flutter)
