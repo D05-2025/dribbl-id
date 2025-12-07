@@ -8,6 +8,7 @@ urlpatterns = [
     path('create-flutter/', views.create_events_flutter, name='create_event_flutter'),
     path('delete-flutter/', views.delete_event_flutter, name='delete_event_flutter'),
     path('edit-flutter/', views.edit_event_flutter, name='edit_event_flutter'),
+    path('update-flutter/', views.update_events_flutter, name='update_events_flutter'),
 
     path('', views.event_list, name='event_list'),
     path('create/', views.create_event, name='create_event'),
