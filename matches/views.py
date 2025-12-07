@@ -209,6 +209,8 @@ def boxscore_edit(request, pk, box_id):
 
 
 # ---- Data endpoints (JSON/XML) ----------------------------------------------
+# matches/views.py
+
 def matches_json(request):
     matches = Match.objects.select_related("season").all()
     data = [{
@@ -220,6 +222,8 @@ def matches_json(request):
         "status": m.status,
         "home_score": m.home_score,
         "away_score": m.away_score,
+        "match_thumbnail": m.image_url, 
+        
     } for m in matches]
     return JsonResponse(data, safe=False)
 
