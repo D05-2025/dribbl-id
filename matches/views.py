@@ -210,23 +210,28 @@ def boxscore_edit(request, pk, box_id):
 
 # ---- Data endpoints (JSON/XML) ----------------------------------------------
 # matches/views.py
+# Pastikan import model Team di bagian paling atas file!
+from django.http import JsonResponse
+from matches.models import Match
 
 def matches_json(request):
-    matches = Match.objects.select_related("season").all()
-    data = [{
-        "uuid": str(m.uuid),
-        "home_team": m.home_team,
-        "away_team": m.away_team,
-        "tipoff_at": m.tipoff_at.isoformat(),
-        "venue": m.venue,
-        "status": m.status,
-        "home_score": m.home_score,
-        "away_score": m.away_score,
-        "match_thumbnail": m.image_url, 
+    matches = Match.objects.all()
+    
+    data = []
+    for m in matches:
+        data.append({
+            "uuid": str(m.uuid),
+            "home_team": m.home_team,
+            "away_team": m.away_team,
+            "tipoff_at": m.tipoff_at.isoformat(),
+            "venue": m.venue,
+            "status": m.status,
+            "home_score": m.home_score,
+            "away_score": m.away_score,
+            "match_thumbnail": m.image_url, 
+        })
         
-    } for m in matches]
     return JsonResponse(data, safe=False)
-
 
 def matches_xml(request):
     matches = Match.objects.select_related("season").all()

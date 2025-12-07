@@ -19,7 +19,6 @@ class Team(models.Model):
             return f"{self.short_name}"
         return self.name
 
-
 class Player(models.Model):
     class Position(models.TextChoices):
         PG = "PG", "Point Guard"
