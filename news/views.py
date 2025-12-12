@@ -15,6 +15,7 @@ from news.models import News
 from news.forms import NewsForm
 from django.contrib.auth.decorators import login_required
 from main.decorators import login_required_custom
+import json
 
 from django.db.models import Q
 
@@ -147,35 +148,24 @@ def add_news_entry_ajax(request):
 @csrf_exempt
 def edit_news_entry_ajax(request, id):
     if not request.user.is_authenticated:
-        return JsonResponse({"status": "error", "message": "User not authenticated"}, status=401)
+        return JsonResponse({"status": "error"}, status=401)
 
     if request.user.role != 'admin':
-        return JsonResponse({"status": "error", "message": "Only admin can edit news"}, status=403)
+        return JsonResponse({"status": "error"}, status=403)
 
     if request.method == "POST":
-        try:
-            news = get_object_or_404(News, pk=id)
-            
-            title = strip_tags(request.POST.get("title"))
-            content = strip_tags(request.POST.get("content"))
-            category = request.POST.get("category")
-            thumbnail = request.POST.get("thumbnail")
-            is_featured = request.POST.get("is_featured") == 'on'
+        data = json.loads(request.body)
 
-            news.title = title
-            news.content = content
-            news.category = category
-            news.thumbnail = thumbnail
-            news.is_featured = is_featured
+        news = get_object_or_404(News, pk=id)
 
-            news.save()
+        news.title = strip_tags(data.get("title", ""))
+        news.content = strip_tags(data.get("content", ""))
+        news.category = data.get("category")
+        news.thumbnail = data.get("thumbnail")
+        news.save()
 
-            return JsonResponse({"status": "success", "message": "News updated successfully"})
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
-    
-    else:
-        return JsonResponse({"status": "error", "message": "Invalid method"}, status=405)
+        return JsonResponse({"status": "success"})
+
 
 @csrf_exempt
 @require_POST 
