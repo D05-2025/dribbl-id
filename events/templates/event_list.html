@@ -15,7 +15,7 @@
 
   .page-wrapper {
     width: 100%;
-    max-width: 1000px;
+    max-width: 1200px;
     text-align: center;
     padding: 20px;
   }
@@ -23,63 +23,86 @@
   h2.title {
     font-weight: 700;
     text-align: center;
-    font-size: 2.5rem;
+    font-size: 2.6rem;
     color: #ffffff;
     text-shadow: 0 0 15px #00ffff, 0 0 25px #00ccff;
-    margin-bottom: 60px;
+    margin-bottom: 40px;
+  }
+
+  .event-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 35px;
+    margin-top: 25px;
   }
 
   .event-card {
     background-color: #0a0a0f;
     border: 1px solid rgba(0,255,255,0.3);
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 0 20px rgba(0,255,255,0.25);
+    border-radius: 18px;
+    padding: 0;
+    box-shadow: 0 0 25px rgba(0,255,255,0.25);
     transition: all 0.3s ease;
     position: relative;
+    overflow: hidden;
   }
 
   .event-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 0 30px rgba(0,255,255,0.45);
+    transform: translateY(-7px);
+    box-shadow: 0 0 40px rgba(0,255,255,0.5);
+  }
+
+  .event-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
   }
 
   .event-card img {
     width: 100%;
-    max-height: 280px;
+    height: 100%;
     object-fit: cover;
-    border-radius: 10px;
-    margin-bottom: 15px;
+    display: block;
   }
 
   .event-date {
     position: absolute;
     top: 15px;
     right: 15px;
-    background-color: #007bff;
+    background-color: rgba(0, 123, 255, 0.95);
     color: #fff;
-    font-size: 0.9rem;
-    padding: 5px 10px;
+    font-size: 0.85rem;
+    padding: 8px 14px;
     border-radius: 8px;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    z-index: 10;
+  }
+
+  .event-content {
+    padding: 22px;
   }
 
   .event-title {
-    font-size: 1.6rem;
+    font-size: 1.7rem;
     color: #00ffff;
     font-weight: bold;
-    margin-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 10px;
   }
 
   .event-meta {
     color: #ccc;
-    font-size: 0.95rem;
+    font-size: 1rem;
     margin-bottom: 6px;
   }
 
   .event-description {
     color: #aaa;
     font-size: 0.95rem;
-    margin-bottom: 12px;
+    margin-top: 10px;
+    margin-bottom: 14px;
   }
 
   .btn-create {
@@ -87,11 +110,11 @@
     background-color: #00ffff;
     color: #000;
     font-weight: bold;
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 12px 22px;
+    border-radius: 10px;
     text-decoration: none;
     transition: 0.3s;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
   }
 
   .btn-create:hover {
@@ -101,8 +124,8 @@
   .btn-edit {
     color: #0dcaf0;
     text-decoration: none;
-    font-weight: 500;
-    margin-right: 15px;
+    font-weight: 600;
+    margin-right: 20px;
   }
 
   .btn-edit:hover {
@@ -110,9 +133,9 @@
   }
 
   .btn-delete {
-    color: #dc3545;
+    color: #ff4d4d;
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 600;
   }
 
   .btn-delete:hover {
@@ -124,13 +147,7 @@
     margin-top: 2rem;
   }
 
-  @media (max-width: 768px) {
-    .page-wrapper {
-      padding: 10px;
-    }
-  }
-
-  /* ===== Modal Konfirmasi ===== */
+  /* ===== Modal ===== */
   .modal-overlay {
     display: none;
     position: fixed;
@@ -152,10 +169,10 @@
     background: #0a0a0f;
     border: 1px solid #00ffff;
     border-radius: 12px;
-    padding: 25px 30px;
+    padding: 25px 35px;
     text-align: center;
-    box-shadow: 0 0 25px rgba(0,255,255,0.5), 0 0 50px rgba(0,255,255,0.2);
-    transform: scale(0.8);
+    box-shadow: 0 0 45px rgba(0,255,255,0.5);
+    transform: scale(0.85);
     transition: transform 0.25s ease;
   }
 
@@ -163,15 +180,10 @@
     transform: scale(1);
   }
 
-  .modal-box h3 {
-    color: #00ffff;
-    margin-bottom: 15px;
-  }
-
   .modal-actions {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 18px;
     margin-top: 20px;
   }
 
@@ -211,42 +223,52 @@
   <h2 class="title">Upcoming Events 🎉</h2>
 
   {% if request.session.role == 'admin' %}
-  <div class="text-center mb-10">
-    <a href="{% url 'events:create_event' %}" class="btn-create">+ Tambah Event</a>
-  </div>
+  <a href="{% url 'events:create_event' %}" class="btn-create">+ Tambah Event</a>
   {% endif %}
 
   {% if events %}
-    <div class="flex flex-col gap-10">
+    <div class="event-grid">
+
       {% for event in events %}
       <div class="event-card">
-        {% if event.image_url %}
-          <img src="{{ event.image_url }}" alt="Event Image">
-        {% else %}
-          <img src="{% static 'img/default-event.jpg' %}" alt="Default Event Image">
-        {% endif %}
-
-        <div class="event-date">{{ event.date|date:"d M Y" }}</div>
-        <h3 class="event-title">{{ event.title }}</h3>
-        <div class="event-meta">📍 {{ event.location|default:"Lokasi belum ditentukan" }}</div>
-
-        {% if event.time %}
-        <div class="event-meta">🕒 {{ event.time }}</div>
-        {% endif %}
-
-        <p class="event-description">{{ event.description|truncatewords:25 }}</p>
-
-        {% if request.session.role == 'admin' %}
-        <div>
-          <a href="{% url 'events:edit_event' event.id %}" class="btn-edit">Edit</a>
-          <a href="#" class="btn-delete" onclick="openModal('{{ event.id }}')">Delete</a>
+        <div class="event-image-wrapper">
+          {% if event.image_url %}
+            <img src="{{ event.image_url }}"
+                 alt="{{ event.title }}"
+                 onerror="this.onerror=null; this.src='{% static 'images/basketball.png' %}'; this.classList.add('fallback-img');"
+                 loading="lazy">
+          {% else %}
+            <img src="{% static 'images/basketball.png' %}"
+                 alt="Default Event Image"
+                 class="fallback-img">
+          {% endif %}
+          <div class="event-date">{{ event.date|date:"d M Y" }}</div>
         </div>
-        {% endif %}
+
+        <div class="event-content">
+          <h3 class="event-title">{{ event.title }}</h3>
+
+          <div class="event-meta">📍 {{ event.location|default:"Lokasi belum ditentukan" }}</div>
+
+          {% if event.time %}
+          <div class="event-meta">🕒 {{ event.time }}</div>
+          {% endif %}
+
+          <p class="event-description">{{ event.description|truncatewords:20 }}</p>
+
+          {% if request.session.role == 'admin' %}
+          <div style="margin-top: 15px;">
+            <a href="{% url 'events:edit_event' event.id %}" class="btn-edit">Edit</a>
+            <a onclick="openModal('{{ event.id }}')" class="btn-delete" style="cursor:pointer;">Delete</a>
+          </div>
+          {% endif %}
+        </div>
       </div>
       {% endfor %}
+
     </div>
 
-    <!-- Modal Konfirmasi Hapus -->
+    <!-- Modal -->
     <div id="deleteModal" class="modal-overlay">
       <div class="modal-box">
         <h3>Konfirmasi Hapus</h3>
@@ -265,27 +287,19 @@
 
 <script>
   function openModal(eventId) {
-    const modal = document.getElementById('deleteModal');
-    const confirmBtn = document.getElementById('confirmDeleteBtn');
-    confirmBtn.href = `/events/${eventId}/delete/`;
-    modal.classList.add('show');
+    const modal = document.getElementById("deleteModal");
+    const btn = document.getElementById("confirmDeleteBtn");
+    btn.href = `/events/${eventId}/delete/`;
+    modal.classList.add("show");
   }
 
   function closeModal() {
-    const modal = document.getElementById('deleteModal');
-    modal.classList.remove('show');
-    setTimeout(() => {
-      modal.style.display = 'none';
-      modal.style.opacity = '0';
-    }, 250);
+    document.getElementById("deleteModal").classList.remove("show");
   }
 
-  // Tutup modal kalau klik di luar box
-  window.onclick = function(event) {
-    const modal = document.getElementById('deleteModal');
-    if (event.target === modal) {
-      closeModal();
-    }
+  window.onclick = function(e) {
+    const modal = document.getElementById("deleteModal");
+    if (e.target === modal) closeModal();
   }
 </script>
 {% endblock %}

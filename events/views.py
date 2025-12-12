@@ -165,3 +165,78 @@ def create_events_flutter(request):
         return JsonResponse({"status": "success"}, status=201)
     else:
         return JsonResponse({"status": "error", "message": "Method not allowed"}, status=405)
+    
+@csrf_exempt
+def delete_event_flutter(request):
+    if request.method == 'POST':
+        event_id = request.POST.get("id")
+
+        if not event_id:
+            return JsonResponse({"status": "error", "message": "Event ID required"}, status=400)
+
+        try:
+            event = Event.objects.get(pk=event_id)
+        except Event.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Event not found"}, status=404)
+
+        event.delete()
+        return JsonResponse({"status": "success"}, status=200)
+
+    return JsonResponse({"status": "error", "message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def edit_event_flutter(request):
+    if request.method != "POST":
+        return JsonResponse({"status": "error", "message": "Invalid method"}, status=400)
+
+    try:
+        data = json.loads(request.body)
+
+        event_id = data.get("id")
+        if event_id is None:
+            return JsonResponse({"status": "error", "message": "Missing event ID"}, status=400)
+
+        try:
+            event = Event.objects.get(id=event_id)
+        except Event.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Event not found"}, status=404)
+
+        # Update fields
+        event.title = data.get("title", event.title)
+        event.description = data.get("description", event.description)
+        event.location = data.get("location", event.location)
+        event.date = data.get("date", event.date)
+        event.time = data.get("time", event.time)
+        event.image_url = data.get("image_url", event.image_url)
+        event.is_public = data.get("is_public", event.is_public)
+
+        event.save()
+
+        return JsonResponse({"status": "success", "message": "Event updated successfully"})
+
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    
+@csrf_exempt
+def update_events_flutter(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        event_id = data.get("id")
+
+        try:
+            event = Event.objects.get(id=event_id, created_by=request.user)
+        except Event.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Not found"}, status=404)
+
+        event.title = data.get("title", event.title)
+        event.description = data.get("description", event.description)
+        event.location = data.get("location", event.location)
+        event.time = data.get("time", event.time)
+        event.date = data.get("date", event.date)
+        event.image_url = data.get("image_url", event.image_url)
+        event.is_public = data.get("is_public", event.is_public)
+
+        event.save()
+        return JsonResponse({"status": "success"}, status=200)
+
+    return JsonResponse({"status": "error", "message": "Method not allowed"}, status=405)
