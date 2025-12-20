@@ -240,3 +240,6 @@ def update_events_flutter(request):
         return JsonResponse({"status": "success"}, status=200)
 
     return JsonResponse({"status": "error", "message": "Method not allowed"}, status=405)
+
+
+#coba tambahin ini buat trigger build
