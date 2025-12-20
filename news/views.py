@@ -24,7 +24,6 @@ from django.db.models import Q
 def add_news_flutter(request):
     if request.method == 'POST':
         try:
-            # Ambil data dari body karena Flutter kirim postJson
             data = json.loads(request.body)
             
             title = strip_tags(data.get("title", "").strip())
@@ -32,7 +31,6 @@ def add_news_flutter(request):
             category = data.get("category", "").strip()
             thumbnail = data.get("thumbnail", "").strip() or None
 
-            # Pastikan user terhubung (sesuaikan dengan logic login kamu)
             new_news = News(
                 title=title, 
                 content=content,
