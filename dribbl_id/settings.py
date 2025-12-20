@@ -60,6 +60,7 @@ LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/login/' 
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', #jadi dipindahin ke paling atas sini
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -69,7 +70,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'main.middleware.CustomAuthMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'dribbl_id.urls'
@@ -174,6 +174,7 @@ APPEND_SLASH = True
 CSRF_TRUSTED_ORIGINS = [
     'https://*.pbp.cs.ui.ac.id',
     'https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id',
+    'http://localhost:51532', #coba nambahin ini juga
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
