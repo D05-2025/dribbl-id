@@ -5,7 +5,6 @@ from main.models import CustomUser
 
 import json
 
-# Create your views here.
 @csrf_exempt
 def login(request):
     username = request.POST['username']
@@ -20,7 +19,6 @@ def login(request):
                 "role": user.role,
                 "status": True,
                 "message": "Login successful!"
-                # Add other data if you want to send data to Flutter.
             }, status=200)
         else:
             return JsonResponse({
@@ -42,14 +40,12 @@ def register(request):
         password = data['password']
         role = data['role']
         
-        # Check if the username is already taken
         if CustomUser.objects.filter(username=username).exists():
             return JsonResponse({
                 "status": False,
                 "message": "Username already exists."
             }, status=400)
         
-        # Create the new user
         user = CustomUser.objects.create(username=username, role=role)
         user.set_password(password)
         user.save()
@@ -82,3 +78,5 @@ def logout(request):
             "status": False,
             "message": "Logout failed."
         }, status=401)
+    
+# nambahin ini buat trigger build

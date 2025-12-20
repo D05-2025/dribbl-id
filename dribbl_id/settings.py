@@ -60,7 +60,7 @@ LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/login/' 
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware', #jadi dipindahin ke paling atas sini
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -174,7 +174,7 @@ APPEND_SLASH = True
 CSRF_TRUSTED_ORIGINS = [
     'https://*.pbp.cs.ui.ac.id',
     'https://febrian-abimanyu-dribbl-id.pbp.cs.ui.ac.id',
-    'http://localhost:51532',
+    'http://localhost:51532', #coba nambahin ini juga
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
