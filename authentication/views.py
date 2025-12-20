@@ -7,37 +7,30 @@ import json
 
 @csrf_exempt
 def login(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            username = data.get('username')
-            password = data.get('password')
-        except Exception:
-            return JsonResponse({"status": False, "message": "Invalid JSON data"}, status=400)
-
-        user = authenticate(username=username, password=password)
-        
-        if user is not None:
-            if user.is_active:
-                auth_login(request, user)
-                return JsonResponse({
-                    "username": user.username,
-                    "role": user.role,
-                    "status": True,
-                    "message": "Login successful!"
-                }, status=200)
-            else:
-                return JsonResponse({
-                    "status": False,
-                    "message": "Login failed, account is disabled."
-                }, status=401)
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(username=username,password=password)
+    if user is not None:
+        if user.is_active:
+            auth_login(request, user)
+            # Login status successful.
+            return JsonResponse({
+                "username": user.username,
+                "role": user.role,
+                "status": True,
+                "message": "Login successful!"
+            }, status=200)
         else:
             return JsonResponse({
                 "status": False,
-                "message": "Login failed, please check your username or password."
+                "message": "Login failed, account is disabled."
             }, status=401)
-            
-    return JsonResponse({"status": False, "message": "Method not allowed"}, status=405)
+
+    else:
+        return JsonResponse({
+            "status": False,
+            "message": "Login failed, please check your username or password."
+        }, status=401)
     
 @csrf_exempt
 def register(request):
