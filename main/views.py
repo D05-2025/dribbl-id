@@ -6,6 +6,8 @@ import datetime, requests
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 
+#buat 
+
 def proxy_image(request):
     image_url = request.GET.get('url')
     if not image_url:

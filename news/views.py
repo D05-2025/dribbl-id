@@ -16,32 +16,51 @@ from news.forms import NewsForm
 from django.contrib.auth.decorators import login_required
 from main.decorators import login_required_custom
 import json
+import requests
 
 from django.db.models import Q
 
+def proxy_image(request):
+    image_url = request.GET.get('url')
+    if not image_url:
+        return HttpResponse('No URL provided', status=400)
+    
+    try:
+        response = requests.get(image_url, timeout=10)
+        response.raise_for_status()
+        
+        return HttpResponse(
+            response.content,
+            content_type=response.headers.get('Content-Type', 'image/jpeg')
+        )
+    except requests.RequestException as e:
+        return HttpResponse(f'Error fetching image: {str(e)}', status=500)
 
 @csrf_exempt
 def add_news_flutter(request):
-    if request.method != "POST":
-        return JsonResponse({"status": "failed", "message": "Invalid method"}, status=400)
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            
+            title = strip_tags(data.get("title", "").strip())
+            content = strip_tags(data.get("content", "").strip())
+            category = data.get("category", "").strip()
+            thumbnail = data.get("thumbnail", "").strip() or None
 
-    data = json.loads(request.body)
+            new_news = News(
+                title=title, 
+                content=content,
+                category=category,
+                thumbnail=thumbnail,
+                user=request.user if request.user.is_authenticated else None
+            )
+            new_news.save()
 
-    title = strip_tags(data.get("title", "").strip())
-    content = strip_tags(data.get("content", "").strip())
-    category = data.get("category", "").strip()
-    thumbnail = data.get("thumbnail", "").strip() or None
+            return JsonResponse({"status": "success"}, status=200)
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
+    return JsonResponse({"status": "error", "message": "Invalid method"}, status=405)
 
-    new_news = News(
-        title=title,
-        content=content,
-        category=category,
-        thumbnail=thumbnail,
-        user=request.user,
-    )
-    new_news.save()
-
-    return JsonResponse({"status": "success"}, status=200)
 
 @login_required
 def show_news_page(request):
@@ -152,35 +171,24 @@ def add_news_entry_ajax(request):
 @csrf_exempt
 def edit_news_entry_ajax(request, id):
     if not request.user.is_authenticated:
-        return JsonResponse({"status": "error", "message": "User not authenticated"}, status=401)
+        return JsonResponse({"status": "error"}, status=401)
 
     if request.user.role != 'admin':
-        return JsonResponse({"status": "error", "message": "Only admin can edit news"}, status=403)
+        return JsonResponse({"status": "error"}, status=403)
 
     if request.method == "POST":
-        try:
-            news = get_object_or_404(News, pk=id)
-            
-            title = strip_tags(request.POST.get("title"))
-            content = strip_tags(request.POST.get("content"))
-            category = request.POST.get("category")
-            thumbnail = request.POST.get("thumbnail")
-            is_featured = request.POST.get("is_featured") == 'on'
+        data = json.loads(request.body)
 
-            news.title = title
-            news.content = content
-            news.category = category
-            news.thumbnail = thumbnail
-            news.is_featured = is_featured
+        news = get_object_or_404(News, pk=id)
 
-            news.save()
+        news.title = strip_tags(data.get("title", ""))
+        news.content = strip_tags(data.get("content", ""))
+        news.category = data.get("category")
+        news.thumbnail = data.get("thumbnail")
+        news.save()
 
-            return JsonResponse({"status": "success", "message": "News updated successfully"})
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
-    
-    else:
-        return JsonResponse({"status": "error", "message": "Invalid method"}, status=405)
+        return JsonResponse({"status": "success"})
+
 
 @csrf_exempt
 @require_POST 
