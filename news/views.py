@@ -22,21 +22,28 @@ from django.db.models import Q
 
 @csrf_exempt
 def add_news_flutter(request):
-    title = strip_tags(request.POST.get("title", "").strip())
-    content = strip_tags(request.POST.get("content", "").strip())
-    category = request.POST.get("category", "").strip()
-    thumbnail = request.POST.get("thumbnail", "").strip() or None
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            
+            title = strip_tags(data.get("title", "").strip())
+            content = strip_tags(data.get("content", "").strip())
+            category = data.get("category", "").strip()
+            thumbnail = data.get("thumbnail", "").strip() or None
 
-    new_news = News(
-        title=title, 
-        content=content,
-        category=category,
-        thumbnail=thumbnail,
-        user=request.user
-    )
-    new_news.save()
+            new_news = News(
+                title=title, 
+                content=content,
+                category=category,
+                thumbnail=thumbnail,
+                user=request.user if request.user.is_authenticated else None
+            )
+            new_news.save()
 
-    return JsonResponse({"status": "success"}, status=200)
+            return JsonResponse({"status": "success"}, status=200)
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
+    return JsonResponse({"status": "error", "message": "Invalid method"}, status=405)
 
 
 @login_required
