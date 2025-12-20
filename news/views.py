@@ -251,3 +251,7 @@ def show_json_by_id(request, news_id):
         return JsonResponse({'detail': 'Not found'}, status=404)
 
 
+#
+#
+#
+# trigger build
