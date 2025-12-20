@@ -62,10 +62,10 @@ LOGIN_URL = '/login/'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware', #jadi dipindahin ke paling atas sini
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
