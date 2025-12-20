@@ -6,7 +6,6 @@ app_name = 'main'
 
 urlpatterns = [
     path('proxy-image/', proxy_image, name='proxy_image'),
-    
     path('', show_main, name='show_main'),
     path('register/', register, name='register'),
     path('login/', login_user, name='login'),

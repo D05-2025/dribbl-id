@@ -15,14 +15,13 @@ def proxy_image(request):
     
     try:
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+            'Referer': 'https://www.google.com/',
         }
 
-        # Fetch image from external source
         response = requests.get(image_url, headers=headers, timeout=10)
         response.raise_for_status()
         
-        # Return the image with proper content type
         return HttpResponse(
             response.content,
             content_type=response.headers.get('Content-Type', 'image/jpeg')
