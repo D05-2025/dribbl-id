@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.html import strip_tags
 import json
 from django.http import JsonResponse
+import requests
 
 def show_json(request):
     events = Event.objects.all()
@@ -241,5 +242,20 @@ def update_events_flutter(request):
 
     return JsonResponse({"status": "error", "message": "Method not allowed"}, status=405)
 
+def proxy_image(request):
+    image_url = request.GET.get('url')
+    if not image_url:
+        return HttpResponse('No URL provided', status=400)
+    
+    try:
+        response = requests.get(image_url, timeout=10)
+        response.raise_for_status()
+        
+        return HttpResponse(
+            response.content,
+            content_type=response.headers.get('Content-Type', 'image/jpeg')
+        )
+    except requests.RequestException as e:
+        return HttpResponse(f'Error fetching image: {str(e)}', status=500)
 
 #coba tambahin ini buat trigger build
