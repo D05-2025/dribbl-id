@@ -20,22 +20,6 @@ import requests
 
 from django.db.models import Q
 
-def proxy_image(request):
-    image_url = request.GET.get('url')
-    if not image_url:
-        return HttpResponse('No URL provided', status=400)
-    
-    try:
-        response = requests.get(image_url, timeout=10)
-        response.raise_for_status()
-        
-        return HttpResponse(
-            response.content,
-            content_type=response.headers.get('Content-Type', 'image/jpeg')
-        )
-    except requests.RequestException as e:
-        return HttpResponse(f'Error fetching image: {str(e)}', status=500)
-
 @csrf_exempt
 def add_news_flutter(request):
     if request.method == 'POST':
