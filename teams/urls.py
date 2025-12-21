@@ -15,11 +15,11 @@ app_name = 'teams'
 urlpatterns = [
     path('json/', show_json, name='show_json'),
     path('create-flutter/', create_team_flutter, name='create_team_flutter'),
-    path('<str:team_name>/', team_detail, name='team_detail'),
     path('', show_teams, name='show_teams'),
     path('add/', add_team, name='add_team'),
     path('get/<str:team_name>/', get_team, name='get_team_data'),
     path('edit/<str:team_name>/', edit_team, name='edit_team'),
     path('delete/<str:team_name>/', delete_team, name='delete_team'),
+    path('<str:team_name>/', team_detail, name='team_detail'),
 ]
 

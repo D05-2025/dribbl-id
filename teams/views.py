@@ -25,13 +25,22 @@ import json
 
 @csrf_exempt
 def create_team_flutter(request):
+    region_index = {
+        'United States' : 'us' ,
+        'Europe' : 'eu',
+        'Asia' : 'as',
+        'Africa' : 'af',
+        'South America' : 'sa',
+        'Oceania' : 'oc'
+    }
+
     if request.method == "POST":
         data = json.loads(request.body)
 
         Team.objects.create(
             name=data["name"],
             logo=data["logo"],
-            region=data["region"],
+            region=region_index[data["region"]],
             founded=datetime.strptime(data["founded"], '%Y-%m-%d').date(),
             description=data["description"]
         )
@@ -43,11 +52,20 @@ def create_team_flutter(request):
 def show_json(request):
     teams = Team.objects.all()
 
+    region_index = {
+        'us': 'United States',
+        'eu': 'Europe',
+        'as': 'Asia',
+        'af': 'Africa',
+        'sa': 'South America',
+        'oc': 'Oceania',
+    }
+
     data = [
         {
             'name': t.name,
             'logo': t.logo,
-            'region': t.region,
+            'region': region_index[t.region],
             'founded': t.founded.strftime('%Y-%m-%d'),
             'description': t.description
         } for t in teams
