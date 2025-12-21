@@ -19,6 +19,25 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Team
 from datetime import datetime
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+@csrf_exempt
+def create_team_flutter(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        Team.objects.create(
+            name=data["name"],
+            city=data["city"],
+            logo_url=data["logo_url"]
+        )
+
+        return JsonResponse({"status": "success"})
+    
+    return JsonResponse({"status": "error"}, status=400)
+
 def show_json(request):
     teams = Team.objects.all()
 
@@ -169,35 +188,4 @@ def team_detail(request, team_name):
     }
     return render(request, 'team_detail.html', context)
 
-@csrf_exempt
-def create_team_flutter(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
 
-            founded_date = None
-            if data.get("founded"):
-                founded_date = datetime.strptime(
-                    data["founded"], "%Y-%m-%d"
-                ).date()
-
-            Team.objects.create(
-                name=data.get("name", ""),
-                logo=data.get("logo", ""),
-                region=data.get("region", ""),
-                founded=founded_date,
-                description=data.get("description", "")
-            )
-
-            return JsonResponse({"status": "success"}, status=200)
-
-        except Exception as e:
-            return JsonResponse({
-                "status": "error",
-                "message": str(e)
-            }, status=400)
-
-    return JsonResponse({
-        "status": "error",
-        "message": "Invalid method"
-    }, status=405)
