@@ -30,8 +30,10 @@ def create_team_flutter(request):
 
         Team.objects.create(
             name=data["name"],
-            city=data["city"],
-            logo_url=data["logo_url"]
+            logo=data["logo"],
+            region=data["region"],
+            founded=datetime.strptime(data["founded"], '%Y-%m-%d').date(),
+            description=data["description"]
         )
 
         return JsonResponse({"status": "success"})
